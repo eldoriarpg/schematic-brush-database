@@ -17,6 +17,7 @@ import de.eldoria.eldoutilities.utils.Futures;
 import de.eldoria.sbrdatabase.SbrDatabase;
 import de.eldoria.schematicbrush.storage.preset.Preset;
 import de.eldoria.schematicbrush.storage.preset.PresetContainer;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -30,7 +31,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public abstract class BasePresetContainer extends QueryFactoryHolder implements PresetContainer {
-    private final UUID uuid;
+    private final @Nullable UUID uuid;
     private Set<String> names = Collections.emptySet();
     private Instant lastRefresh = Instant.MIN;
 
@@ -40,7 +41,7 @@ public abstract class BasePresetContainer extends QueryFactoryHolder implements 
             .setVisibility(PropertyAccessor.IS_GETTER, JsonAutoDetect.Visibility.NONE)
             .enableDefaultTypingAsProperty(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE, "clazz");
 
-    public BasePresetContainer(UUID uuid, QueryFactoryHolder factoryHolder) {
+    public BasePresetContainer(@Nullable UUID uuid, QueryFactoryHolder factoryHolder) {
         super(factoryHolder);
         this.uuid = uuid;
     }
@@ -83,7 +84,7 @@ public abstract class BasePresetContainer extends QueryFactoryHolder implements 
     public UUID uuid() {
         return uuid;
     }
-    public byte[] uuidBytes() {
-        return UUIDConverter.convert(uuid);
+    public byte @Nullable [] uuidBytes() {
+        return uuid == null ? null : UUIDConverter.convert(uuid);
     }
 }
