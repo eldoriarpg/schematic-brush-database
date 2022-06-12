@@ -20,7 +20,7 @@ public class PostgresDbConfig extends BaseDbConfig {
 
     public PostgresDbConfig(Map<String, Object> objectMap) {
         super(objectMap);
-        this.schema = SerializationUtil.mapOf(objectMap).getValue("schema");
+        schema = SerializationUtil.mapOf(objectMap).getValue("schema");
     }
 
     @Override

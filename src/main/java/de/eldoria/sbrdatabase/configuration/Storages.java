@@ -55,7 +55,7 @@ public class Storages implements ConfigurationSerializable {
         return postgres;
     }
 
-    public boolean isActive(SqlType type) {
+    public boolean isActive(SqlType<?> type) {
         return activeTypes.stream().anyMatch(t -> t.equalsIgnoreCase(type.getName()));
     }
 }

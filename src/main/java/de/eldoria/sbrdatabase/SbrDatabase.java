@@ -48,11 +48,12 @@ public class SbrDatabase extends EldoPlugin {
                 .build());
 
         configuration = new Configuration(this);
+
+        registerStorageTypes();
     }
 
     @Override
     public void onPluginEnable() throws Throwable {
-
     }
 
     @Override
@@ -66,64 +67,69 @@ public class SbrDatabase extends EldoPlugin {
     }
 
     private void registerStorageTypes() throws IOException, SQLException {
+        var storages = configuration.storages();
         for (var sqlType : new SqlType<?>[]{SqlType.MYSQL, SqlType.POSTGRES, SqlType.MARIADB}) {
-            SqlType.MARIADB.getName();
+            if (!storages.isActive(sqlType)) continue;
+            logger().info("Setting up storage for " + sqlType.getName()
+            );
             switch (sqlType.getName()) {
-                case "mariadb" -> {
-                    var dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.MARIADB)
-                            .configure(config -> {
-                                var mariadb = configuration.storages().mariadb();
-                                applyBaseDb(mariadb, config);
-                            }).create())
-                            .build();
-                    SqlUpdater.builder(dataSource, SqlType.MARIADB)
-                            .withLogger(LoggerAdapter.wrap(logger()))
-                            .execute();
-                    var presets = new MariaDbPresets(dataSource);
-                    sbr.presetStorage().register(Nameable.of("mariadb"), presets);
-                }
-                case "postgres" -> {
-                    var postgres = configuration.storages().postgres();
-                    var dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.POSTGRES)
-                            .configure(config -> {
-                                var mariadb = configuration.storages().mariadb();
-                                applyBaseDb(mariadb, config);
-                            }).create())
-                            .build();
-                    SqlUpdater.builder(dataSource, SqlType.POSTGRES)
-                            .withLogger(LoggerAdapter.wrap(logger()))
-                            .setReplacements(new QueryReplacement("sbr_database", postgres.schema()))
-                            .setSchemas(postgres.schema())
-                            .execute();
-                    dataSource.close();
-                    dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.POSTGRES)
-                            .configure(config -> {
-                                applyBaseDb(postgres, config);
-                            }).create())
-                            .forSchema(postgres.schema())
-                            .build();
-                    var presets = new PostgresPresets(dataSource);
-                    sbr.presetStorage().register(Nameable.of("postgres"), presets);
-                }
-                case "mysql" -> {
-                    var dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.MYSQL)
-                            .configure(config -> {
-                                var mysql = configuration.storages().mysql();
-                                applyBaseDb(mysql, config);
-                            }).create())
-                            .build();
-                    SqlUpdater.builder(dataSource, SqlType.MYSQL)
-                            .withLogger(LoggerAdapter.wrap(logger()))
-                            .execute();
-                    var presets = new MySqlPresets(dataSource);
-                    sbr.presetStorage().register(Nameable.of("mariadb"), presets);
-                }
+                case "mariadb" -> setupMariaDb();
+                case "postgres" -> setupPostgres();
+                case "mysql" -> setupMySql();
             }
         }
     }
 
-    private <T extends RemoteJdbcConfig<T>> RemoteJdbcConfig<T> applyBaseDb(BaseDbConfig config, RemoteJdbcConfig<T> remote) {
-        return remote.host(config.host())
+    private void setupMariaDb() throws IOException, SQLException {
+        var storages = configuration.storages();
+        var dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.MARIADB)
+                .configure(config -> applyBaseDb(storages.mariadb(), config))
+                .create())
+                .build();
+        SqlUpdater.builder(dataSource, SqlType.MARIADB)
+                .withLogger(LoggerAdapter.wrap(logger()))
+                .execute();
+        var presets = new MariaDbPresets(dataSource);
+        sbr.presetStorage().register(Nameable.of("mariadb"), presets);
+
+    }
+
+    private void setupMySql() throws IOException, SQLException {
+        var storages = configuration.storages();
+        var dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.MYSQL)
+                .configure(config -> applyBaseDb(storages.mysql(), config))
+                .create())
+                .build();
+        SqlUpdater.builder(dataSource, SqlType.MYSQL)
+                .withLogger(LoggerAdapter.wrap(logger()))
+                .execute();
+        var presets = new MySqlPresets(dataSource);
+        sbr.presetStorage().register(Nameable.of("mariadb"), presets);
+    }
+
+    private void setupPostgres() throws IOException, SQLException {
+        var storages = configuration.storages();
+        var postgres = storages.postgres();
+        var dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.POSTGRES)
+                .configure(config -> applyBaseDb(postgres, config)).create())
+                .build();
+        SqlUpdater.builder(dataSource, SqlType.POSTGRES)
+                .withLogger(LoggerAdapter.wrap(logger()))
+                .setReplacements(new QueryReplacement("sbr_database", postgres.schema()))
+                .setSchemas(postgres.schema())
+                .execute();
+        dataSource.close();
+        dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.POSTGRES)
+                .configure(config -> applyBaseDb(postgres, config))
+                .create())
+                .forSchema(postgres.schema())
+                .build();
+        var presets = new PostgresPresets(dataSource);
+        sbr.presetStorage().register(Nameable.of("postgres"), presets);
+    }
+
+    private <T extends RemoteJdbcConfig<T>> void applyBaseDb(BaseDbConfig config, RemoteJdbcConfig<T> remote) {
+        remote.host(config.host())
                 .port(config.port())
                 .database(config.database())
                 .user(config.user())

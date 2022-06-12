@@ -8,6 +8,8 @@ package de.eldoria.sbrdatabase.dao.base;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.chojo.sqlutil.base.QueryFactoryHolder;
 import de.chojo.sqlutil.conversion.UUIDConverter;
@@ -43,6 +45,7 @@ public abstract class BasePresetContainer extends QueryFactoryHolder implements 
         this.uuid = uuid;
     }
 
+    @SuppressWarnings("OverlyBroadCatchBlock")
     protected Preset jsonToPreset(String preset) {
         try {
             return MAPPER.readValue(preset, Preset.class);
@@ -52,6 +55,7 @@ public abstract class BasePresetContainer extends QueryFactoryHolder implements 
         }
     }
 
+    @SuppressWarnings("OverlyBroadCatchBlock")
     protected String presetToJson(Preset preset) {
         try {
             return MAPPER.writeValueAsString(preset);
