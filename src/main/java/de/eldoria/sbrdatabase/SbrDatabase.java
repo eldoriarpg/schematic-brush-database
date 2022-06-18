@@ -17,6 +17,10 @@ import de.chojo.sqlutil.wrapper.QueryBuilderConfig;
 import de.eldoria.eldoutilities.plugin.EldoPlugin;
 import de.eldoria.sbrdatabase.configuration.BaseDbConfig;
 import de.eldoria.sbrdatabase.configuration.Configuration;
+import de.eldoria.sbrdatabase.dao.mariadb.MariaDbBrushes;
+import de.eldoria.sbrdatabase.dao.mysql.MySqlBrushes;
+import de.eldoria.sbrdatabase.dao.postgres.PostgresBrushes;
+import de.eldoria.sbrdatabase.storage.BaseStorage;
 import de.eldoria.sbrdatabase.dao.mariadb.MariaDbPresets;
 import de.eldoria.sbrdatabase.dao.mysql.MySqlPresets;
 import de.eldoria.sbrdatabase.dao.postgres.PostgresPresets;
@@ -70,8 +74,7 @@ public class SbrDatabase extends EldoPlugin {
         var storages = configuration.storages();
         for (var sqlType : new SqlType<?>[]{SqlType.MYSQL, SqlType.POSTGRES, SqlType.MARIADB}) {
             if (!storages.isActive(sqlType)) continue;
-            logger().info("Setting up storage for " + sqlType.getName()
-            );
+            logger().info("Setting up storage for " + sqlType.getName());
             switch (sqlType.getName()) {
                 case "mariadb" -> setupMariaDb();
                 case "postgres" -> setupPostgres();
@@ -89,9 +92,8 @@ public class SbrDatabase extends EldoPlugin {
         SqlUpdater.builder(dataSource, SqlType.MARIADB)
                 .withLogger(LoggerAdapter.wrap(logger()))
                 .execute();
-        var presets = new MariaDbPresets(dataSource);
-        sbr.presetStorage().register(Nameable.of("mariadb"), presets);
-
+        sbr.storageRegistry().register(Nameable.of("mariadb"),
+                new BaseStorage(new MariaDbPresets(dataSource), new MariaDbBrushes(dataSource)));
     }
 
     private void setupMySql() throws IOException, SQLException {
@@ -103,8 +105,8 @@ public class SbrDatabase extends EldoPlugin {
         SqlUpdater.builder(dataSource, SqlType.MYSQL)
                 .withLogger(LoggerAdapter.wrap(logger()))
                 .execute();
-        var presets = new MySqlPresets(dataSource);
-        sbr.presetStorage().register(Nameable.of("mariadb"), presets);
+        sbr.storageRegistry().register(Nameable.of("mariadb"),
+                new BaseStorage(new MySqlPresets(dataSource), new MySqlBrushes(dataSource)));
     }
 
     private void setupPostgres() throws IOException, SQLException {
@@ -124,8 +126,8 @@ public class SbrDatabase extends EldoPlugin {
                 .create())
                 .forSchema(postgres.schema())
                 .build();
-        var presets = new PostgresPresets(dataSource);
-        sbr.presetStorage().register(Nameable.of("postgres"), presets);
+        sbr.storageRegistry().register(Nameable.of("postgres"),
+                new BaseStorage(new PostgresPresets(dataSource), new PostgresBrushes(dataSource)));
     }
 
     private <T extends RemoteJdbcConfig<T>> void applyBaseDb(BaseDbConfig config, RemoteJdbcConfig<T> remote) {

@@ -6,12 +6,12 @@
 
 package de.eldoria.sbrdatabase.dao.mariadb;
 
-import de.eldoria.sbrdatabase.dao.mysql.MySqlPresets;
+import de.eldoria.sbrdatabase.dao.mysql.MySqlBrushes;
 
 import javax.sql.DataSource;
 
-public class MariaDbPresets extends MySqlPresets {
-    public MariaDbPresets(DataSource dataSource) {
+public class MariaDbBrushes extends MySqlBrushes {
+    public MariaDbBrushes(DataSource dataSource) {
         super(dataSource);
     }
 }

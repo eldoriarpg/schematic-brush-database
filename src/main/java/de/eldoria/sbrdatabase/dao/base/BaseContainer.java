@@ -8,15 +8,11 @@ package de.eldoria.sbrdatabase.dao.base;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.chojo.sqlutil.base.QueryFactoryHolder;
 import de.chojo.sqlutil.conversion.UUIDConverter;
 import de.eldoria.eldoutilities.utils.Futures;
 import de.eldoria.sbrdatabase.SbrDatabase;
-import de.eldoria.schematicbrush.storage.preset.Preset;
-import de.eldoria.schematicbrush.storage.preset.PresetContainer;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -30,26 +26,25 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-public abstract class BasePresetContainer extends QueryFactoryHolder implements PresetContainer {
-    private final @Nullable UUID uuid;
-    private Set<String> names = Collections.emptySet();
-    private Instant lastRefresh = Instant.MIN;
-
+public abstract class BaseContainer extends QueryFactoryHolder {
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
             .setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE)
             .setVisibility(PropertyAccessor.IS_GETTER, JsonAutoDetect.Visibility.NONE)
             .enableDefaultTypingAsProperty(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE, "clazz");
+    private final @Nullable UUID uuid;
+    private Set<String> names = Collections.emptySet();
+    private Instant lastRefresh = Instant.MIN;
 
-    public BasePresetContainer(@Nullable UUID uuid, QueryFactoryHolder factoryHolder) {
+    public BaseContainer(@Nullable UUID uuid, QueryFactoryHolder factoryHolder) {
         super(factoryHolder);
         this.uuid = uuid;
     }
 
     @SuppressWarnings("OverlyBroadCatchBlock")
-    protected Preset jsonToPreset(String preset) {
+    protected <T> T jsonToObject(String preset, Class<T> clazz) {
         try {
-            return MAPPER.readValue(preset, Preset.class);
+            return MAPPER.readValue(preset, clazz);
         } catch (IOException e) {
             SbrDatabase.logger().log(Level.SEVERE, "Could not deserialize preset", e);
             return null;
@@ -57,7 +52,7 @@ public abstract class BasePresetContainer extends QueryFactoryHolder implements 
     }
 
     @SuppressWarnings("OverlyBroadCatchBlock")
-    protected String presetToJson(Preset preset) {
+    protected <T> String presetToJson(T preset) {
         try {
             return MAPPER.writeValueAsString(preset);
         } catch (IOException e) {
@@ -66,7 +61,6 @@ public abstract class BasePresetContainer extends QueryFactoryHolder implements 
         }
     }
 
-    @Override
     public final Set<String> names() {
         // TODO: Make refresh time configurable.
         if (lastRefresh.isBefore(Instant.now().minus(30, ChronoUnit.SECONDS))) {
@@ -84,6 +78,7 @@ public abstract class BasePresetContainer extends QueryFactoryHolder implements 
     public UUID uuid() {
         return uuid;
     }
+
     public byte @Nullable [] uuidBytes() {
         return uuid == null ? null : UUIDConverter.convert(uuid);
     }

@@ -6,20 +6,23 @@
 
 package de.eldoria.sbrdatabase.dao.postgres;
 
+import de.eldoria.sbrdatabase.dao.mariadb.MariaDbBrushes;
 import de.eldoria.sbrdatabase.dao.mariadb.MariaDbPresets;
+import de.eldoria.schematicbrush.storage.brush.BrushContainer;
 import de.eldoria.schematicbrush.storage.preset.PresetContainer;
 import de.eldoria.schematicbrush.storage.preset.Presets;
 
 import javax.sql.DataSource;
 import java.util.UUID;
 
-public class PostgresPresets extends MariaDbPresets implements Presets {
-    public PostgresPresets(DataSource dataSource) {
+public class PostgresBrushes extends MariaDbBrushes {
+    public PostgresBrushes(DataSource dataSource) {
         super(dataSource);
     }
 
+
     @Override
-    public PresetContainer getContainer(UUID uuid) {
-        return new PostgresPresetContainer(uuid, this);
+    public BrushContainer getContainer(UUID uuid) {
+        return new PostgresBrushContainer(uuid, this);
     }
 }

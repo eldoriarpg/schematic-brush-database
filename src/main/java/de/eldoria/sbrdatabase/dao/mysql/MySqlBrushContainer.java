@@ -8,8 +8,8 @@ package de.eldoria.sbrdatabase.dao.mysql;
 
 import de.chojo.sqlutil.base.QueryFactoryHolder;
 import de.eldoria.sbrdatabase.dao.base.BaseContainer;
-import de.eldoria.schematicbrush.storage.preset.Preset;
-import de.eldoria.schematicbrush.storage.preset.PresetContainer;
+import de.eldoria.schematicbrush.storage.brush.Brush;
+import de.eldoria.schematicbrush.storage.brush.BrushContainer;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -18,25 +18,25 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public class MySqlPresetContainer extends BaseContainer implements PresetContainer {
+public class MySqlBrushContainer extends BaseContainer implements BrushContainer {
 
-    public MySqlPresetContainer(UUID uuid, QueryFactoryHolder factoryHolder) {
+    public MySqlBrushContainer(UUID uuid, QueryFactoryHolder factoryHolder) {
         super(uuid, factoryHolder);
     }
 
     @Override
-    public CompletableFuture<Optional<Preset>> get(String name) {
-        return builder(Preset.class).query("SELECT preset FROM presets WHERE uuid=? AND name=?")
+    public CompletableFuture<Optional<Brush>> get(String name) {
+        return builder(Brush.class).query("SELECT preset FROM presets WHERE uuid=? AND name=?")
                 .paramsBuilder(paramBuilder -> paramBuilder
                         .setBytes(uuidBytes())
                         .setString(name)).readRow(resultSet ->
-                        jsonToObject(resultSet.getString("preset"), Preset.class))
+                        jsonToObject(resultSet.getString("preset"), Brush.class))
                 .first();
     }
 
     @Override
-    public CompletableFuture<Void> add(Preset preset) {
-        return builder().query("INSERT INTO presets(uuid, name, preset) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE preset = ?")
+    public CompletableFuture<Void> add(Brush preset) {
+        return builder().query("INSERT INTO brushes(uuid, name, brush) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE brush = ?")
                 .paramsBuilder(stmt ->
                         stmt.setString(presetToJson(preset))
                                 .setBytes(uuidBytes())
@@ -45,17 +45,18 @@ public class MySqlPresetContainer extends BaseContainer implements PresetContain
                                 .setString(presetToJson(preset))).insert().execute().thenApply(r -> null);
     }
 
+
     @Override
-    public CompletableFuture<Collection<Preset>> getPresets() {
-        return builder(Preset.class).queryWithoutParams("SELECT uuid, name, preset FROM presets")
-                .readRow(resultSet -> jsonToObject(resultSet.getString("preset"), Preset.class))
+    public CompletableFuture<Collection<Brush>> getPresets() {
+        return builder(Brush.class).queryWithoutParams("SELECT uuid, name, brush FROM brushes")
+                .readRow(resultSet -> jsonToObject(resultSet.getString("preset"), Brush.class))
                 .all()
                 .thenApply(list -> list);
     }
 
     @Override
     public CompletableFuture<Boolean> remove(String name) {
-        return builder(Boolean.class).query("DELETE FROM presets WHERE uuid=? AND name=?")
+        return builder(Boolean.class).query("DELETE FROM brushes WHERE uuid=? AND name=?")
                 .paramsBuilder(paramBuilder ->
                         paramBuilder.setBytes(uuidBytes())
                                 .setString(name)).delete().execute().thenApply(i -> i == 1);
@@ -63,7 +64,7 @@ public class MySqlPresetContainer extends BaseContainer implements PresetContain
 
     @Override
     protected CompletableFuture<List<String>> retrieveNames() {
-        return builder(String.class).queryWithoutParams("SELECT name FROM presets")
+        return builder(String.class).queryWithoutParams("SELECT name FROM brushes")
                 .readRow(resultSet -> resultSet.getString("name"))
                 .all();
     }
