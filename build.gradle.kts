@@ -28,7 +28,7 @@ dependencies {
     compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.10")
 
     spigot("org.postgresql", "postgresql", "42.4.0")
-    spigot("com.fasterxml.jackson.core", "jackson-databind", "2.0.1")
+    spigot("com.fasterxml.jackson.core", "jackson-databind", "2.13.3")
     spigot("org.mariadb.jdbc", "mariadb-java-client", "3.0.5")
     spigot("mysql", "mysql-connector-java", "8.0.29")
     spigot("com.zaxxer", "HikariCP", "5.0.1")
@@ -36,7 +36,7 @@ dependencies {
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.8.2")
     testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     testImplementation("de.eldoria", "eldo-util", "1.13.9")
-    testImplementation("com.fasterxml.jackson.core", "jackson-databind", "2.0.1")
+    testImplementation("com.fasterxml.jackson.core", "jackson-databind", "2.13.3")
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine")
 }
 
