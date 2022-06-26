@@ -27,8 +27,7 @@ public class MySqlPresetContainer extends BaseContainer implements PresetContain
     @Override
     public CompletableFuture<Optional<Preset>> get(String name) {
         return builder(Preset.class).query("SELECT preset FROM presets WHERE uuid=? AND name=?")
-                .paramsBuilder(paramBuilder -> paramBuilder
-                        .setBytes(uuidBytes())
+                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
                         .setString(name)).readRow(resultSet ->
                         yamlToObject(resultSet.getString("preset"), Preset.class))
                 .first();
@@ -37,12 +36,10 @@ public class MySqlPresetContainer extends BaseContainer implements PresetContain
     @Override
     public CompletableFuture<Void> add(Preset preset) {
         return builder().query("INSERT INTO presets(uuid, name, preset) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE preset = ?")
-                .paramsBuilder(stmt ->
-                        stmt.setString(presetToYaml(preset))
-                                .setBytes(uuidBytes())
-                                .setString(preset.name())
-                                .setString(presetToYaml(preset))
-                                .setString(presetToYaml(preset))).insert().execute().thenApply(r -> null);
+                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
+                        .setString(preset.name())
+                        .setString(presetToYaml(preset))
+                        .setString(presetToYaml(preset))).insert().execute().thenApply(r -> null);
     }
 
     @Override
@@ -57,9 +54,11 @@ public class MySqlPresetContainer extends BaseContainer implements PresetContain
     @Override
     public CompletableFuture<Boolean> remove(String name) {
         return builder(Boolean.class).query("DELETE FROM presets WHERE uuid=? AND name=?")
-                .paramsBuilder(paramBuilder ->
-                        paramBuilder.setBytes(uuidBytes())
-                                .setString(name)).delete().execute().thenApply(i -> i == 1);
+                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
+                        .setString(name))
+                .delete()
+                .execute()
+                .thenApply(i -> i == 1);
     }
 
     @Override

@@ -100,6 +100,7 @@ public class SbrDatabase extends EldoPlugin {
                 .build();
         SqlUpdater.builder(dataSource, SqlType.MARIADB)
                 .withLogger(LoggerAdapter.wrap(logger()))
+                .setVersionTable("sbr_version")
                 .execute();
         sbr.storageRegistry().register(Nameable.of("mariadb"),
                 new BaseStorage(new MariaDbPresets(dataSource), new MariaDbBrushes(dataSource)));
@@ -113,6 +114,7 @@ public class SbrDatabase extends EldoPlugin {
                 .build();
         SqlUpdater.builder(dataSource, SqlType.MYSQL)
                 .withLogger(LoggerAdapter.wrap(logger()))
+                .setVersionTable("sbr_version")
                 .execute();
         sbr.storageRegistry().register(Nameable.of("mysql"),
                 new BaseStorage(new MySqlPresets(dataSource), new MySqlBrushes(dataSource)));
@@ -128,6 +130,7 @@ public class SbrDatabase extends EldoPlugin {
                 .withLogger(LoggerAdapter.wrap(logger()))
                 .setReplacements(new QueryReplacement("sbr_database", postgres.schema()))
                 .setSchemas(postgres.schema())
+                .setVersionTable("sbr_version")
                 .execute();
         dataSource.close();
         dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.POSTGRES)

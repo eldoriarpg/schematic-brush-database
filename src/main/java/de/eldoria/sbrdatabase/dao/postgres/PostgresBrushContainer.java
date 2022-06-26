@@ -23,8 +23,7 @@ public class PostgresBrushContainer extends MySqlBrushContainer {
     public CompletableFuture<Void> add(Brush preset) {
         return builder().query("INSERT INTO brushes(uuid, name, brush) VALUES(?, ?, ?) ON CONFLICT(uuid, name) DO UPDATE SET brush = excluded.brush")
                 .paramsBuilder(stmt ->
-                        stmt.setString(presetToYaml(preset))
-                                .setBytes(uuidBytes())
+                        stmt.setBytes(uuidBytes())
                                 .setString(preset.name())
                                 .setString(presetToYaml(preset)))
                 .insert()

@@ -26,23 +26,23 @@ public class MySqlBrushContainer extends BaseContainer implements BrushContainer
 
     @Override
     public CompletableFuture<Optional<Brush>> get(String name) {
-        return builder(Brush.class).query("SELECT preset FROM presets WHERE uuid=? AND name=?")
-                .paramsBuilder(paramBuilder -> paramBuilder
-                        .setBytes(uuidBytes())
-                        .setString(name)).readRow(resultSet ->
-                        yamlToObject(resultSet.getString("preset"), Brush.class))
+        return builder(Brush.class).query("SELECT preset FROM presets WHERE uuid = ? AND name = ?")
+                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
+                        .setString(name))
+                .readRow(rs -> yamlToObject(rs.getString("preset"), Brush.class))
                 .first();
     }
 
     @Override
     public CompletableFuture<Void> add(Brush preset) {
         return builder().query("INSERT INTO brushes(uuid, name, brush) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE brush = ?")
-                .paramsBuilder(stmt ->
-                        stmt.setString(presetToYaml(preset))
-                                .setBytes(uuidBytes())
-                                .setString(preset.name())
-                                .setString(presetToYaml(preset))
-                                .setString(presetToYaml(preset))).insert().execute().thenApply(r -> null);
+                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
+                        .setString(preset.name())
+                        .setString(presetToYaml(preset))
+                        .setString(presetToYaml(preset)))
+                .insert()
+                .execute()
+                .thenApply(r -> null);
     }
 
 
@@ -57,9 +57,11 @@ public class MySqlBrushContainer extends BaseContainer implements BrushContainer
     @Override
     public CompletableFuture<Boolean> remove(String name) {
         return builder(Boolean.class).query("DELETE FROM brushes WHERE uuid=? AND name=?")
-                .paramsBuilder(paramBuilder ->
-                        paramBuilder.setBytes(uuidBytes())
-                                .setString(name)).delete().execute().thenApply(i -> i == 1);
+                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
+                        .setString(name))
+                .delete()
+                .execute()
+                .thenApply(i -> i == 1);
     }
 
     @Override

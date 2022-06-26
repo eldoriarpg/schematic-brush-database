@@ -26,13 +26,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public abstract class BaseContainer extends QueryFactoryHolder {
-    private final @Nullable UUID uuid;
+    private static final UUID GLOBAL =new UUID(0,0);
+    private final UUID uuid;
     private Set<String> names = Collections.emptySet();
     private Instant lastRefresh = Instant.MIN;
 
     public BaseContainer(@Nullable UUID uuid, QueryFactoryHolder factoryHolder) {
         super(factoryHolder);
-        this.uuid = uuid;
+        this.uuid = uuid == null ? GLOBAL : uuid;
     }
 
     protected <T extends ConfigurationSerializable> T yamlToObject(String preset, Class<T> clazz) {
@@ -66,7 +67,7 @@ public abstract class BaseContainer extends QueryFactoryHolder {
         return uuid;
     }
 
-    public byte @Nullable [] uuidBytes() {
-        return uuid == null ? null : UUIDConverter.convert(uuid);
+    public byte[] uuidBytes() {
+        return UUIDConverter.convert(uuid);
     }
 }

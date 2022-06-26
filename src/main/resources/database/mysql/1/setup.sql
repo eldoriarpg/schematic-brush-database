@@ -1,19 +1,17 @@
-CREATE TABLE presets
-(
-    uuid   BINARY(16),
-    name   TEXT NOT NULL,
-    preset JSON NOT NULL,
-    PRIMARY KEY (uuid(16), name(64)),
-    CONSTRAINT preset
-        CHECK (JSON_VALID(`preset`))
-);
-
 CREATE TABLE brushes
 (
-    uuid  BINARY(16),
-    name  TEXT NOT NULL,
-    brush JSON NOT NULL,
-    PRIMARY KEY (uuid(16), name(64)),
-    CONSTRAINT brush
-        CHECK (JSON_VALID(`brush`))
+    uuid  BINARY(128) NOT NULL ,
+    name  TEXT       NOT NULL,
+    brush MEDIUMTEXT NOT NULL,
+    CONSTRAINT `brushes_uuid_name(64)_uindex`
+        UNIQUE (uuid, name(64))
+);
+
+CREATE TABLE presets
+(
+    uuid   BINARY(128) NOT NULL ,
+    name   TEXT       NOT NULL,
+    preset MEDIUMTEXT NOT NULL,
+    CONSTRAINT `presets_uuid_name(64)_uindex`
+        UNIQUE (uuid, name(64))
 );

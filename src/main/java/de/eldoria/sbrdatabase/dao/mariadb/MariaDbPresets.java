@@ -7,11 +7,18 @@
 package de.eldoria.sbrdatabase.dao.mariadb;
 
 import de.eldoria.sbrdatabase.dao.mysql.MySqlPresets;
+import de.eldoria.schematicbrush.storage.preset.PresetContainer;
 
 import javax.sql.DataSource;
+import java.util.UUID;
 
 public class MariaDbPresets extends MySqlPresets {
     public MariaDbPresets(DataSource dataSource) {
         super(dataSource);
+    }
+
+    @Override
+    public PresetContainer getContainer(UUID uuid) {
+        return new MariaDbPresetContainer(uuid, this);
     }
 }
