@@ -22,12 +22,11 @@ dependencies {
         exclude("com.zaxxer")
     }
 
-    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.1.9-SNAPSHOT")
+    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.1.11-SNAPSHOT")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.10")
 
     bukkitLibrary("org.postgresql", "postgresql", "42.4.0")
-    bukkitLibrary("com.fasterxml.jackson.core", "jackson-databind", "2.0.1")
     bukkitLibrary("org.mariadb.jdbc", "mariadb-java-client", "3.0.5")
     bukkitLibrary("mysql", "mysql-connector-java", "8.0.29")
     bukkitLibrary("com.zaxxer", "HikariCP", "5.0.1")
@@ -36,6 +35,7 @@ dependencies {
     testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     testImplementation("de.eldoria", "eldo-util", "1.13.9")
     testImplementation("com.fasterxml.jackson.core", "jackson-databind", "2.0.1")
+
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine")
 }
 
@@ -126,9 +126,11 @@ tasks {
 }
 
 
-bukkit{
+bukkit {
+    name = "SchematicBrushDatabase"
     main = "de.eldoria.sbrdatabase.SbrDatabase"
     apiVersion = "1.16"
+    version = publishData.getVersion(true)
     authors = listOf("RainbowDashLabs")
     depend = listOf("SchematicBrushReborn")
 }

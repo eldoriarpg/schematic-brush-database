@@ -30,7 +30,7 @@ public class MySqlPresetContainer extends BaseContainer implements PresetContain
                 .paramsBuilder(paramBuilder -> paramBuilder
                         .setBytes(uuidBytes())
                         .setString(name)).readRow(resultSet ->
-                        jsonToObject(resultSet.getString("preset"), Preset.class))
+                        yamlToObject(resultSet.getString("preset"), Preset.class))
                 .first();
     }
 
@@ -38,17 +38,18 @@ public class MySqlPresetContainer extends BaseContainer implements PresetContain
     public CompletableFuture<Void> add(Preset preset) {
         return builder().query("INSERT INTO presets(uuid, name, preset) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE preset = ?")
                 .paramsBuilder(stmt ->
-                        stmt.setString(presetToJson(preset))
+                        stmt.setString(presetToYaml(preset))
                                 .setBytes(uuidBytes())
                                 .setString(preset.name())
-                                .setString(presetToJson(preset))
-                                .setString(presetToJson(preset))).insert().execute().thenApply(r -> null);
+                                .setString(presetToYaml(preset))
+                                .setString(presetToYaml(preset))).insert().execute().thenApply(r -> null);
     }
 
     @Override
-    public CompletableFuture<Collection<Preset>> getPresets() {
-        return builder(Preset.class).queryWithoutParams("SELECT uuid, name, preset FROM presets")
-                .readRow(resultSet -> jsonToObject(resultSet.getString("preset"), Preset.class))
+    public CompletableFuture<Collection<Preset>> all() {
+        return builder(Preset.class).query("SELECT uuid, name, preset FROM presets WHERE uuid = ?")
+                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes()))
+                .readRow(resultSet -> yamlToObject(resultSet.getString("preset"), Preset.class))
                 .all()
                 .thenApply(list -> list);
     }
@@ -63,7 +64,8 @@ public class MySqlPresetContainer extends BaseContainer implements PresetContain
 
     @Override
     protected CompletableFuture<List<String>> retrieveNames() {
-        return builder(String.class).queryWithoutParams("SELECT name FROM presets")
+        return builder(String.class).query("SELECT name FROM presets WHERE uuid = ?")
+                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes()))
                 .readRow(resultSet -> resultSet.getString("name"))
                 .all();
     }

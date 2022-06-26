@@ -23,9 +23,9 @@ public class PostgresPresetContainer extends MySqlPresetContainer {
     public CompletableFuture<Void> add(Preset preset) {
         return builder().query("INSERT INTO presets(uuid, name, preset) VALUES(?, ?, ?) ON CONFLICT(uuid, name) DO UPDATE SET preset = excluded.preset")
                 .paramsBuilder(stmt ->
-                        stmt.setString(presetToJson(preset))
+                        stmt.setString(presetToYaml(preset))
                                 .setBytes(uuidBytes())
                                 .setString(preset.name())
-                                .setString(presetToJson(preset))).insert().execute().thenApply(r -> null);
+                                .setString(presetToYaml(preset))).insert().execute().thenApply(r -> null);
     }
 }

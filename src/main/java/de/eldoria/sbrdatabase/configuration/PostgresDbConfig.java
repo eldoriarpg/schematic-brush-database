@@ -26,7 +26,7 @@ public class PostgresDbConfig extends BaseDbConfig {
     @Override
     public @NotNull Map<String, Object> serialize() {
         return SerializationUtil.newBuilder(super.serialize())
-                .add(schema)
+                .add("schema", schema)
                 .build();
     }
 

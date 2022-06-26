@@ -1,6 +1,6 @@
 CREATE TABLE presets
 (
-    uuid   BINARY(16)                   NOT NULL,
+    uuid   BINARY(16),
     name   TEXT                         NOT NULL,
     preset LONGTEXT COLLATE utf8mb4_bin NOT NULL,
     PRIMARY KEY (uuid, name(64)),
@@ -10,7 +10,7 @@ CREATE TABLE presets
 
 CREATE TABLE brushes
 (
-    uuid  BINARY(16)                   NOT NULL,
+    uuid  BINARY(16),
     name  TEXT                         NOT NULL,
     brush LONGTEXT COLLATE utf8mb4_bin NOT NULL,
     PRIMARY KEY (uuid, name(64)),

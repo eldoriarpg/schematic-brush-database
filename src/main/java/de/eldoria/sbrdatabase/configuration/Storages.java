@@ -12,6 +12,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -26,16 +27,20 @@ public class Storages implements ConfigurationSerializable {
 
     public Storages(Map<String, Object> objectMap) {
         var map = SerializationUtil.mapOf(objectMap);
-        activeTypes = map.getValue("activeTypes");
-        mysql = map.getValue("mysql");
-        mariadb = map.getValue("mariadb");
-        postgres = map.getValue("postgres");
+        activeTypes = map.getValueOrDefault("activeTypes", Collections.emptyList());
+        mysql = map.getValueOrDefault("mysql", new BaseDbConfig());
+        mariadb = map.getValueOrDefault("mariadb", new BaseDbConfig());
+        postgres = map.getValueOrDefault("postgres", new PostgresDbConfig());
     }
 
     @Override
     @NotNull
     public Map<String, Object> serialize() {
         return SerializationUtil.newBuilder()
+                .add("activeTypes", activeTypes)
+                .add("mysql", mysql)
+                .add("mariadb", mariadb)
+                .add("postgres", postgres)
                 .build();
     }
 

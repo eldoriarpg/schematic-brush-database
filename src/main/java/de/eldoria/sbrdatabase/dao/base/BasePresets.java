@@ -11,10 +11,8 @@ import com.google.common.cache.CacheBuilder;
 import de.chojo.sqlutil.base.QueryFactoryHolder;
 import de.eldoria.schematicbrush.storage.preset.PresetContainer;
 import de.eldoria.schematicbrush.storage.preset.Presets;
-import org.bukkit.entity.Player;
 
 import javax.sql.DataSource;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;

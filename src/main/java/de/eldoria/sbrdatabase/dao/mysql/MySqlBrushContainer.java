@@ -30,7 +30,7 @@ public class MySqlBrushContainer extends BaseContainer implements BrushContainer
                 .paramsBuilder(paramBuilder -> paramBuilder
                         .setBytes(uuidBytes())
                         .setString(name)).readRow(resultSet ->
-                        jsonToObject(resultSet.getString("preset"), Brush.class))
+                        yamlToObject(resultSet.getString("preset"), Brush.class))
                 .first();
     }
 
@@ -38,18 +38,18 @@ public class MySqlBrushContainer extends BaseContainer implements BrushContainer
     public CompletableFuture<Void> add(Brush preset) {
         return builder().query("INSERT INTO brushes(uuid, name, brush) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE brush = ?")
                 .paramsBuilder(stmt ->
-                        stmt.setString(presetToJson(preset))
+                        stmt.setString(presetToYaml(preset))
                                 .setBytes(uuidBytes())
                                 .setString(preset.name())
-                                .setString(presetToJson(preset))
-                                .setString(presetToJson(preset))).insert().execute().thenApply(r -> null);
+                                .setString(presetToYaml(preset))
+                                .setString(presetToYaml(preset))).insert().execute().thenApply(r -> null);
     }
 
 
     @Override
-    public CompletableFuture<Collection<Brush>> getPresets() {
+    public CompletableFuture<Collection<Brush>> all() {
         return builder(Brush.class).queryWithoutParams("SELECT uuid, name, brush FROM brushes")
-                .readRow(resultSet -> jsonToObject(resultSet.getString("preset"), Brush.class))
+                .readRow(resultSet -> yamlToObject(resultSet.getString("preset"), Brush.class))
                 .all()
                 .thenApply(list -> list);
     }

@@ -6,16 +6,15 @@
 
 package de.eldoria.sbrdatabase.dao.base;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.chojo.sqlutil.base.QueryFactoryHolder;
 import de.chojo.sqlutil.conversion.UUIDConverter;
+import de.eldoria.eldoutilities.serialization.wrapper.YamlContainer;
 import de.eldoria.eldoutilities.utils.Futures;
 import de.eldoria.sbrdatabase.SbrDatabase;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
@@ -27,11 +26,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public abstract class BaseContainer extends QueryFactoryHolder {
-    private static final ObjectMapper MAPPER = new ObjectMapper()
-            .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
-            .setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE)
-            .setVisibility(PropertyAccessor.IS_GETTER, JsonAutoDetect.Visibility.NONE)
-            .enableDefaultTypingAsProperty(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE, "clazz");
     private final @Nullable UUID uuid;
     private Set<String> names = Collections.emptySet();
     private Instant lastRefresh = Instant.MIN;
@@ -41,24 +35,17 @@ public abstract class BaseContainer extends QueryFactoryHolder {
         this.uuid = uuid;
     }
 
-    @SuppressWarnings("OverlyBroadCatchBlock")
-    protected <T> T jsonToObject(String preset, Class<T> clazz) {
+    protected <T extends ConfigurationSerializable> T yamlToObject(String preset, Class<T> clazz) {
         try {
-            return MAPPER.readValue(preset, clazz);
-        } catch (IOException e) {
+            return YamlContainer.yamlToObject(preset, clazz);
+        } catch (InvalidConfigurationException e) {
             SbrDatabase.logger().log(Level.SEVERE, "Could not deserialize preset", e);
             return null;
         }
     }
 
-    @SuppressWarnings("OverlyBroadCatchBlock")
-    protected <T> String presetToJson(T preset) {
-        try {
-            return MAPPER.writeValueAsString(preset);
-        } catch (IOException e) {
-            SbrDatabase.logger().log(Level.SEVERE, "Could not serialize preset", e);
-            return null;
-        }
+    protected <T extends ConfigurationSerializable> String presetToYaml(T preset) {
+        return YamlContainer.objectToYaml(preset);
     }
 
     public final Set<String> names() {

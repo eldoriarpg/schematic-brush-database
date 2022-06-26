@@ -17,6 +17,8 @@ import de.chojo.sqlutil.wrapper.QueryBuilderConfig;
 import de.eldoria.eldoutilities.plugin.EldoPlugin;
 import de.eldoria.sbrdatabase.configuration.BaseDbConfig;
 import de.eldoria.sbrdatabase.configuration.Configuration;
+import de.eldoria.sbrdatabase.configuration.PostgresDbConfig;
+import de.eldoria.sbrdatabase.configuration.Storages;
 import de.eldoria.sbrdatabase.dao.mariadb.MariaDbBrushes;
 import de.eldoria.sbrdatabase.dao.mysql.MySqlBrushes;
 import de.eldoria.sbrdatabase.dao.postgres.PostgresBrushes;
@@ -26,9 +28,11 @@ import de.eldoria.sbrdatabase.dao.mysql.MySqlPresets;
 import de.eldoria.sbrdatabase.dao.postgres.PostgresPresets;
 import de.eldoria.schematicbrush.SchematicBrushReborn;
 import de.eldoria.schematicbrush.brush.config.util.Nameable;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -70,6 +74,11 @@ public class SbrDatabase extends EldoPlugin {
         executor.shutdown();
     }
 
+    @Override
+    public List<Class<? extends ConfigurationSerializable>> getConfigSerialization() {
+        return List.of(Storages.class, BaseDbConfig.class, PostgresDbConfig.class);
+    }
+
     private void registerStorageTypes() throws IOException, SQLException {
         var storages = configuration.storages();
         for (var sqlType : new SqlType<?>[]{SqlType.MYSQL, SqlType.POSTGRES, SqlType.MARIADB}) {
@@ -105,7 +114,7 @@ public class SbrDatabase extends EldoPlugin {
         SqlUpdater.builder(dataSource, SqlType.MYSQL)
                 .withLogger(LoggerAdapter.wrap(logger()))
                 .execute();
-        sbr.storageRegistry().register(Nameable.of("mariadb"),
+        sbr.storageRegistry().register(Nameable.of("mysql"),
                 new BaseStorage(new MySqlPresets(dataSource), new MySqlBrushes(dataSource)));
     }
 

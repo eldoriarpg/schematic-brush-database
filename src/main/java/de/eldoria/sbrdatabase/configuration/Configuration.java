@@ -23,7 +23,7 @@ public class Configuration extends EldoConfig {
 
     @Override
     protected void saveConfigs() {
-
+        getConfig().set("storages", storages);
     }
 
     public Storages storages() {
