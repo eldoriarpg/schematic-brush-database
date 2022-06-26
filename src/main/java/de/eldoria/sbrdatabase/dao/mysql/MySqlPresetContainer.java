@@ -26,10 +26,10 @@ public class MySqlPresetContainer extends BaseContainer implements PresetContain
 
     @Override
     public CompletableFuture<Optional<Preset>> get(String name) {
-        return builder(Preset.class).query("SELECT preset FROM presets WHERE uuid=? AND name=?")
+        return builder(Preset.class).query("SELECT preset FROM presets WHERE uuid = ? AND name LIKE ?")
                 .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
-                        .setString(name)).readRow(resultSet ->
-                        yamlToObject(resultSet.getString("preset"), Preset.class))
+                        .setString(name))
+                .readRow(resultSet -> yamlToObject(resultSet.getString("preset"), Preset.class))
                 .first();
     }
 
@@ -53,7 +53,7 @@ public class MySqlPresetContainer extends BaseContainer implements PresetContain
 
     @Override
     public CompletableFuture<Boolean> remove(String name) {
-        return builder(Boolean.class).query("DELETE FROM presets WHERE uuid=? AND name=?")
+        return builder(Boolean.class).query("DELETE FROM presets WHERE uuid = ? AND name LIKE ?")
                 .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
                         .setString(name))
                 .delete()

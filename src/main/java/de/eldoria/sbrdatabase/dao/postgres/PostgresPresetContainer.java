@@ -10,6 +10,7 @@ import de.chojo.sqlutil.base.QueryFactoryHolder;
 import de.eldoria.sbrdatabase.dao.mysql.MySqlPresetContainer;
 import de.eldoria.schematicbrush.storage.preset.Preset;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -26,5 +27,24 @@ public class PostgresPresetContainer extends MySqlPresetContainer {
                         stmt.setBytes(uuidBytes())
                                 .setString(preset.name())
                                 .setString(presetToYaml(preset))).insert().execute().thenApply(r -> null);
+    }
+
+    @Override
+    public CompletableFuture<Optional<Preset>> get(String name) {
+        return builder(Preset.class).query("SELECT preset FROM presets WHERE uuid = ? AND name LIKE ?")
+                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
+                        .setString(name))
+                .readRow(resultSet -> yamlToObject(resultSet.getString("preset"), Preset.class))
+                .first();
+    }
+
+    @Override
+    public CompletableFuture<Boolean> remove(String name) {
+        return builder(Boolean.class).query("DELETE FROM presets WHERE uuid = ? AND name ILIKE ?")
+                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
+                        .setString(name))
+                .delete()
+                .execute()
+                .thenApply(i -> i == 1);
     }
 }

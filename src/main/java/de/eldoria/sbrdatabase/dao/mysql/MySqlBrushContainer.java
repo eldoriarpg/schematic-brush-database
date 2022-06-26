@@ -26,7 +26,7 @@ public class MySqlBrushContainer extends BaseContainer implements BrushContainer
 
     @Override
     public CompletableFuture<Optional<Brush>> get(String name) {
-        return builder(Brush.class).query("SELECT preset FROM presets WHERE uuid = ? AND name = ?")
+        return builder(Brush.class).query("SELECT preset FROM presets WHERE uuid = ? AND name LIKE ?")
                 .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
                         .setString(name))
                 .readRow(rs -> yamlToObject(rs.getString("preset"), Brush.class))
@@ -56,7 +56,7 @@ public class MySqlBrushContainer extends BaseContainer implements BrushContainer
 
     @Override
     public CompletableFuture<Boolean> remove(String name) {
-        return builder(Boolean.class).query("DELETE FROM brushes WHERE uuid=? AND name=?")
+        return builder(Boolean.class).query("DELETE FROM brushes WHERE uuid = ? AND name LIKE ?")
                 .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
                         .setString(name))
                 .delete()

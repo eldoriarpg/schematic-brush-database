@@ -9,7 +9,10 @@ package de.eldoria.sbrdatabase.dao.postgres;
 import de.chojo.sqlutil.base.QueryFactoryHolder;
 import de.eldoria.sbrdatabase.dao.mysql.MySqlBrushContainer;
 import de.eldoria.schematicbrush.storage.brush.Brush;
+import de.eldoria.schematicbrush.storage.brush.Brushes;
+import de.eldoria.schematicbrush.storage.preset.Preset;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -30,4 +33,24 @@ public class PostgresBrushContainer extends MySqlBrushContainer {
                 .execute()
                 .thenApply(r -> null);
     }
+
+    @Override
+    public CompletableFuture<Optional<Brush>> get(String name) {
+        return builder(Brush.class).query("SELECT brush FROM brushes WHERE uuid = ? AND name ILIKE ?")
+                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
+                        .setString(name))
+                .readRow(resultSet -> yamlToObject(resultSet.getString("brush"), Brush.class))
+                .first();
+    }
+
+    @Override
+    public CompletableFuture<Boolean> remove(String name) {
+        return builder(Boolean.class).query("DELETE FROM brushes WHERE uuid = ? AND name ILIKE ?")
+                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
+                        .setString(name))
+                .delete()
+                .execute()
+                .thenApply(i -> i == 1);
+    }
+
 }
