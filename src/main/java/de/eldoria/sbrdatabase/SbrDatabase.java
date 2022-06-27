@@ -15,11 +15,11 @@ import de.chojo.sqlutil.updater.QueryReplacement;
 import de.chojo.sqlutil.updater.SqlUpdater;
 import de.chojo.sqlutil.wrapper.QueryBuilderConfig;
 import de.eldoria.eldoutilities.plugin.EldoPlugin;
-import de.eldoria.sbrdatabase.configuration.elements.storages.BaseDbConfig;
-import de.eldoria.sbrdatabase.configuration.elements.Cache;
 import de.eldoria.sbrdatabase.configuration.Configuration;
-import de.eldoria.sbrdatabase.configuration.elements.storages.PostgresDbConfig;
+import de.eldoria.sbrdatabase.configuration.elements.Cache;
 import de.eldoria.sbrdatabase.configuration.elements.Storages;
+import de.eldoria.sbrdatabase.configuration.elements.storages.BaseDbConfig;
+import de.eldoria.sbrdatabase.configuration.elements.storages.PostgresDbConfig;
 import de.eldoria.sbrdatabase.dao.mariadb.MariaDbStorage;
 import de.eldoria.sbrdatabase.dao.mysql.MySqlStorage;
 import de.eldoria.sbrdatabase.dao.postgres.PostgresStorage;
@@ -27,6 +27,7 @@ import de.eldoria.schematicbrush.SchematicBrushReborn;
 import de.eldoria.schematicbrush.brush.config.util.Nameable;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -93,63 +94,46 @@ public class SbrDatabase extends EldoPlugin {
     }
 
     private void setupMariaDb() throws IOException, SQLException {
-        var storages = configuration.storages();
-        var dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.MARIADB)
-                .configure(config -> applyBaseDb(storages.mariadb(), config))
-                .create(), storages.mariadb())
-                .withMaximumPoolSize(storages.mariadb().connections())
-                .build();
-        SqlUpdater.builder(dataSource, SqlType.MARIADB)
-                .withLogger(LoggerAdapter.wrap(logger()))
-                .setVersionTable("sbr_version")
-                .execute();
-        sbr.storageRegistry().register(mariadb, new MariaDbStorage(dataSource, configuration));
+        var dataSource = applyBaseDb(SqlType.MARIADB, configuration.storages().mariadb()).build();
+        updater(dataSource, SqlType.MARIADB).execute();
+        sbr.storageRegistry().register(SbrDatabase.mariadb, new MariaDbStorage(dataSource, configuration));
     }
 
     private void setupMySql() throws IOException, SQLException {
-        var storages = configuration.storages();
-        var dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.MYSQL)
-                .configure(config -> applyBaseDb(storages.mysql(), config))
-                .create(), storages.mysql())
-                .withMaximumPoolSize(storages.mysql().connections())
-                .build();
-        SqlUpdater.builder(dataSource, SqlType.MYSQL)
-                .withLogger(LoggerAdapter.wrap(logger()))
-                .setVersionTable("sbr_version")
-                .execute();
-        sbr.storageRegistry().register(mysql, new MySqlStorage(dataSource, configuration));
+        var dataSource = applyBaseDb(SqlType.MYSQL, configuration.storages().mysql()).build();
+        updater(dataSource, SqlType.MYSQL).execute();
+        sbr.storageRegistry().register(SbrDatabase.mysql, new MySqlStorage(dataSource, configuration));
     }
 
     private void setupPostgres() throws IOException, SQLException {
-        var storages = configuration.storages();
-        var db = storages.postgres();
-        var dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.POSTGRES)
-                .configure(config -> applyBaseDb(db, config)).create(), db)
-                .build();
-        SqlUpdater.builder(dataSource, SqlType.POSTGRES)
-                .withLogger(LoggerAdapter.wrap(logger()))
-                .setReplacements(new QueryReplacement("sbr_database", db.schema()))
-                .setSchemas(db.schema())
-                .setVersionTable("sbr_version")
+        var postgres = configuration.storages().postgres();
+        var dataSource = applyBaseDb(SqlType.POSTGRES, postgres).build();
+        updater(dataSource, SqlType.POSTGRES)
+                .setReplacements(new QueryReplacement("sbr_database", postgres.schema()))
+                .setSchemas(postgres.schema())
                 .execute();
         dataSource.close();
-        dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.POSTGRES)
-                .configure(config -> applyBaseDb(db, config))
-                .create(), db)
-                .forSchema(db.schema())
+        dataSource = applyBaseDb(SqlType.POSTGRES, postgres)
+                .forSchema(postgres.schema())
                 .build();
-        sbr.storageRegistry().register(postgres, new PostgresStorage(dataSource, configuration));
+        sbr.storageRegistry().register(SbrDatabase.postgres, new PostgresStorage(dataSource, configuration));
     }
 
-    private <T extends RemoteJdbcConfig<T>> void applyBaseDb(BaseDbConfig config, RemoteJdbcConfig<T> remote) {
-        remote.host(config.host())
-                .port(config.port())
-                .database(config.database())
-                .user(config.user())
-                .password(config.password());
+    private SqlUpdater.SqlUpdaterBuilder<?> updater(DataSource dataSource, SqlType<?> type) throws IOException {
+        return SqlUpdater.builder(dataSource, type)
+                .setVersionTable("sbr_version")
+                .withLogger(LoggerAdapter.wrap(getLogger()));
     }
 
-    private ConfigurationStage applyHikariSettings(ConfigurationStage configurationStage, BaseDbConfig dbConfig) {
-        return configurationStage.withMinimumIdle(1).withMaximumPoolSize(dbConfig.connections());
+    private <T extends RemoteJdbcConfig<T>> ConfigurationStage applyBaseDb(SqlType<T> type, BaseDbConfig config) {
+        return DataSourceCreator.create(type)
+                .configure(remote -> remote.host(config.host())
+                        .port(config.port())
+                        .database(config.database())
+                        .user(config.user())
+                        .password(config.password()))
+                .create()
+                .withMinimumIdle(1)
+                .withMaximumPoolSize(config.connections());
     }
 }
