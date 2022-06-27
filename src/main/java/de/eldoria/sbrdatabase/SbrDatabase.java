@@ -19,16 +19,11 @@ import de.eldoria.sbrdatabase.configuration.BaseDbConfig;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.configuration.PostgresDbConfig;
 import de.eldoria.sbrdatabase.configuration.Storages;
-import de.eldoria.sbrdatabase.dao.mariadb.MariaDbBrushes;
-import de.eldoria.sbrdatabase.dao.mysql.MySqlBrushes;
-import de.eldoria.sbrdatabase.dao.postgres.PostgresBrushes;
-import de.eldoria.sbrdatabase.storage.BaseStorage;
-import de.eldoria.sbrdatabase.dao.mariadb.MariaDbPresets;
-import de.eldoria.sbrdatabase.dao.mysql.MySqlPresets;
-import de.eldoria.sbrdatabase.dao.postgres.PostgresPresets;
+import de.eldoria.sbrdatabase.dao.mariadb.MariaDbStorage;
+import de.eldoria.sbrdatabase.dao.mysql.MySqlStorage;
+import de.eldoria.sbrdatabase.dao.postgres.PostgresStorage;
 import de.eldoria.schematicbrush.SchematicBrushReborn;
 import de.eldoria.schematicbrush.brush.config.util.Nameable;
-import de.eldoria.schematicbrush.storage.Storage;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 import java.io.IOException;
@@ -100,37 +95,35 @@ public class SbrDatabase extends EldoPlugin {
         var storages = configuration.storages();
         var dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.MARIADB)
                 .configure(config -> applyBaseDb(storages.mariadb(), config))
-                .create())
+                .create(), storages.mariadb())
                 .withMaximumPoolSize(storages.mariadb().connections())
                 .build();
         SqlUpdater.builder(dataSource, SqlType.MARIADB)
                 .withLogger(LoggerAdapter.wrap(logger()))
                 .setVersionTable("sbr_version")
                 .execute();
-        sbr.storageRegistry().register(mariadb,
-                new BaseStorage(new MariaDbPresets(dataSource,configuration), new MariaDbBrushes(dataSource,configuration)));
+        sbr.storageRegistry().register(mariadb, new MariaDbStorage(dataSource, configuration));
     }
 
     private void setupMySql() throws IOException, SQLException {
         var storages = configuration.storages();
         var dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.MYSQL)
                 .configure(config -> applyBaseDb(storages.mysql(), config))
-                .create())
+                .create(), storages.mysql())
                 .withMaximumPoolSize(storages.mysql().connections())
                 .build();
         SqlUpdater.builder(dataSource, SqlType.MYSQL)
                 .withLogger(LoggerAdapter.wrap(logger()))
                 .setVersionTable("sbr_version")
                 .execute();
-        sbr.storageRegistry().register(mysql,
-                new BaseStorage(new MySqlPresets(dataSource, configuration), new MySqlBrushes(dataSource, configuration)));
+        sbr.storageRegistry().register(mysql, new MySqlStorage(dataSource, configuration));
     }
 
     private void setupPostgres() throws IOException, SQLException {
         var storages = configuration.storages();
         var db = storages.postgres();
         var dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.POSTGRES)
-                .configure(config -> applyBaseDb(db, config)).create())
+                .configure(config -> applyBaseDb(db, config)).create(), db)
                 .build();
         SqlUpdater.builder(dataSource, SqlType.POSTGRES)
                 .withLogger(LoggerAdapter.wrap(logger()))
@@ -141,12 +134,10 @@ public class SbrDatabase extends EldoPlugin {
         dataSource.close();
         dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.POSTGRES)
                 .configure(config -> applyBaseDb(db, config))
-                .create())
-                .withMaximumPoolSize(db.connections())
+                .create(), db)
                 .forSchema(db.schema())
                 .build();
-        sbr.storageRegistry().register(postgres,
-                new BaseStorage(new PostgresPresets(dataSource, configuration), new PostgresBrushes(dataSource,configuration)));
+        sbr.storageRegistry().register(postgres, new PostgresStorage(dataSource, configuration));
     }
 
     private <T extends RemoteJdbcConfig<T>> void applyBaseDb(BaseDbConfig config, RemoteJdbcConfig<T> remote) {
@@ -157,8 +148,7 @@ public class SbrDatabase extends EldoPlugin {
                 .password(config.password());
     }
 
-    private ConfigurationStage applyHikariSettings(ConfigurationStage configurationStage) {
-        //TODO: Config
-        return configurationStage.withMinimumIdle(2).withMaximumPoolSize(5);
+    private ConfigurationStage applyHikariSettings(ConfigurationStage configurationStage, BaseDbConfig dbConfig) {
+        return configurationStage.withMinimumIdle(1).withMaximumPoolSize(dbConfig.connections());
     }
 }
