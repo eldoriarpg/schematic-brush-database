@@ -7,9 +7,11 @@
 package de.eldoria.sbrdatabase.dao.mysql;
 
 import de.chojo.sqlutil.base.QueryFactoryHolder;
+import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BaseContainer;
 import de.eldoria.schematicbrush.storage.brush.Brush;
 import de.eldoria.schematicbrush.storage.brush.BrushContainer;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -20,8 +22,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class MySqlBrushContainer extends BaseContainer implements BrushContainer {
 
-    public MySqlBrushContainer(UUID uuid, QueryFactoryHolder factoryHolder) {
-        super(uuid, factoryHolder);
+    public MySqlBrushContainer(@Nullable UUID uuid, Configuration configuration, QueryFactoryHolder factoryHolder) {
+        super(uuid, configuration, factoryHolder);
     }
 
     @Override

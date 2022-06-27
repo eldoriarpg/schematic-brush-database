@@ -7,6 +7,7 @@
 package de.eldoria.sbrdatabase.dao.mysql;
 
 import de.chojo.sqlutil.conversion.UUIDConverter;
+import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BasePresets;
 import de.eldoria.schematicbrush.storage.preset.PresetContainer;
 
@@ -17,8 +18,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class MySqlPresets extends BasePresets {
-    public MySqlPresets(DataSource dataSource) {
-        super(dataSource);
+    public MySqlPresets(DataSource dataSource, Configuration configuration) {
+        super(dataSource, configuration);
     }
 
     @Override
@@ -45,6 +46,6 @@ public class MySqlPresets extends BasePresets {
 
     @Override
     public PresetContainer getContainer(UUID uuid) {
-        return new MySqlPresetContainer(uuid, this);
+        return new MySqlPresetContainer(uuid,  configuration(),this);
     }
 }

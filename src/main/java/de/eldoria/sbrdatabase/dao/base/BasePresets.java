@@ -9,6 +9,7 @@ package de.eldoria.sbrdatabase.dao.base;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import de.chojo.sqlutil.base.QueryFactoryHolder;
+import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.schematicbrush.storage.preset.PresetContainer;
 import de.eldoria.schematicbrush.storage.preset.Presets;
 
@@ -23,9 +24,11 @@ public abstract class BasePresets extends QueryFactoryHolder implements Presets 
             .maximumSize(50)
             .build();
     private PresetContainer global;
+    private final Configuration configuration;
 
-    public BasePresets(DataSource dataSource) {
+    public BasePresets(DataSource dataSource, Configuration configuration) {
         super(dataSource);
+        this.configuration = configuration;
     }
 
     @Override
@@ -46,4 +49,8 @@ public abstract class BasePresets extends QueryFactoryHolder implements Presets 
     }
 
     public abstract PresetContainer getContainer(UUID uuid);
+
+    public Configuration configuration() {
+        return configuration;
+    }
 }

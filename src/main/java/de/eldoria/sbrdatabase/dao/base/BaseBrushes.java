@@ -9,6 +9,7 @@ package de.eldoria.sbrdatabase.dao.base;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import de.chojo.sqlutil.base.QueryFactoryHolder;
+import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.schematicbrush.storage.brush.BrushContainer;
 import de.eldoria.schematicbrush.storage.brush.Brushes;
 
@@ -23,9 +24,11 @@ public abstract class BaseBrushes extends QueryFactoryHolder implements Brushes 
             .maximumSize(50)
             .build();
     private BrushContainer global;
+    private final Configuration configuration;
 
-    public BaseBrushes(DataSource dataSource) {
+    public BaseBrushes(DataSource dataSource, Configuration configuration) {
         super(dataSource);
+        this.configuration = configuration;
     }
 
     @Override
@@ -46,4 +49,8 @@ public abstract class BaseBrushes extends QueryFactoryHolder implements Brushes 
     }
 
     public abstract BrushContainer getContainer(UUID uuid);
+
+    public Configuration configuration() {
+        return configuration;
+    }
 }

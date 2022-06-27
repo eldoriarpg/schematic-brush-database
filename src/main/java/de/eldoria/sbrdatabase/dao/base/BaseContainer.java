@@ -11,6 +11,7 @@ import de.chojo.sqlutil.conversion.UUIDConverter;
 import de.eldoria.eldoutilities.serialization.wrapper.YamlContainer;
 import de.eldoria.eldoutilities.utils.Futures;
 import de.eldoria.sbrdatabase.SbrDatabase;
+import de.eldoria.sbrdatabase.configuration.Configuration;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.Nullable;
@@ -26,14 +27,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public abstract class BaseContainer extends QueryFactoryHolder {
-    private static final UUID GLOBAL =new UUID(0,0);
+    private static final UUID GLOBAL = new UUID(0, 0);
     private final UUID uuid;
+    private final Configuration configuration;
     private Set<String> names = Collections.emptySet();
     private Instant lastRefresh = Instant.MIN;
 
-    public BaseContainer(@Nullable UUID uuid, QueryFactoryHolder factoryHolder) {
+    public BaseContainer(@Nullable UUID uuid, Configuration configuration, QueryFactoryHolder factoryHolder) {
         super(factoryHolder);
         this.uuid = uuid == null ? GLOBAL : uuid;
+        this.configuration = configuration;
     }
 
     protected <T extends ConfigurationSerializable> T yamlToObject(String preset, Class<T> clazz) {
@@ -50,8 +53,7 @@ public abstract class BaseContainer extends QueryFactoryHolder {
     }
 
     public final Set<String> names() {
-        // TODO: Make refresh time configurable.
-        if (lastRefresh.isBefore(Instant.now().minus(30, ChronoUnit.SECONDS))) {
+        if (lastRefresh.isBefore(Instant.now().minus(configuration.cache().cacheRefreshSec(), ChronoUnit.SECONDS))) {
             lastRefresh = Instant.now();
             retrieveNames()
                     .whenComplete(Futures.whenComplete(

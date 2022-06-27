@@ -8,27 +8,37 @@ package de.eldoria.sbrdatabase.configuration;
 
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.SerializableAs;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
+@SerializableAs("sbdDbConfig")
 public class BaseDbConfig implements ConfigurationSerializable {
-    private String host = "localhost";
-    private String port = "3306";
-    private String database = "public";
-    private String user = "root";
-    private String password = "passy";
+    protected String host;
+    protected String port;
+    protected String database;
+    protected String user;
+    protected String password;
+    protected int connections;
 
     public BaseDbConfig() {
+        connections = 3;
+        password = "passy";
+        user = "root";
+        database = "public";
+        port = "3306";
+        host = "localhost";
     }
 
     public BaseDbConfig(Map<String, Object> objectMap) {
         var map = SerializationUtil.mapOf(objectMap);
-        host = map.getValue("host");
-        port = map.getValue("port");
-        database = map.getValue("database");
-        user = map.getValue("user");
-        password = map.getValue("password");
+        host = map.getValueOrDefault("host", "localhost");
+        port = map.getValueOrDefault("port", "3306");
+        database = map.getValueOrDefault("database", "public");
+        user = map.getValueOrDefault("user", "root");
+        password = map.getValueOrDefault("password", "passy");
+        connections = map.getValueOrDefault("connections", 3);
     }
 
     @Override
@@ -40,6 +50,7 @@ public class BaseDbConfig implements ConfigurationSerializable {
                 .add("database", database)
                 .add("user", user)
                 .add("password", password)
+                .add("connections", connections)
                 .build();
     }
 
@@ -61,5 +72,9 @@ public class BaseDbConfig implements ConfigurationSerializable {
 
     public String password() {
         return password;
+    }
+
+    public int connections() {
+        return connections;
     }
 }

@@ -11,6 +11,7 @@ import org.bukkit.plugin.Plugin;
 
 public class Configuration extends EldoConfig {
     private Storages storages;
+    private Cache cache;
 
     public Configuration(Plugin plugin) {
         super(plugin);
@@ -19,6 +20,7 @@ public class Configuration extends EldoConfig {
     @Override
     protected void reloadConfigs() {
         storages = getConfig().getObject("storages", Storages.class, new Storages());
+        cache = getConfig().getObject("cache", Cache.class, new Cache());
     }
 
     @Override
@@ -28,5 +30,9 @@ public class Configuration extends EldoConfig {
 
     public Storages storages() {
         return storages;
+    }
+
+    public Cache cache() {
+        return cache;
     }
 }

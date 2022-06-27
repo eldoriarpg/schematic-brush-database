@@ -9,6 +9,7 @@ package de.eldoria.sbrdatabase.configuration;
 import de.chojo.sqlutil.databases.SqlType;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.SerializableAs;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+@SerializableAs("sbdStorages")
 public class Storages implements ConfigurationSerializable {
     private List<String> activeTypes = new ArrayList<>();
     private BaseDbConfig mysql = new BaseDbConfig();

@@ -7,15 +7,18 @@
 package de.eldoria.sbrdatabase.configuration;
 
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
+import org.bukkit.configuration.serialization.SerializableAs;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
+@SerializableAs("sbdPostgresDbConfig")
 public class PostgresDbConfig extends BaseDbConfig {
 
     private String schema = "public";
 
     public PostgresDbConfig() {
+        port = "5432";
     }
 
     public PostgresDbConfig(Map<String, Object> objectMap) {

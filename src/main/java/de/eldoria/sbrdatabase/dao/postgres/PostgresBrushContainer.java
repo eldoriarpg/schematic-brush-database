@@ -7,10 +7,12 @@
 package de.eldoria.sbrdatabase.dao.postgres;
 
 import de.chojo.sqlutil.base.QueryFactoryHolder;
+import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.mysql.MySqlBrushContainer;
 import de.eldoria.schematicbrush.storage.brush.Brush;
 import de.eldoria.schematicbrush.storage.brush.Brushes;
 import de.eldoria.schematicbrush.storage.preset.Preset;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -18,8 +20,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class PostgresBrushContainer extends MySqlBrushContainer {
 
-    public PostgresBrushContainer(UUID uuid, QueryFactoryHolder factoryHolder) {
-        super(uuid, factoryHolder);
+    public PostgresBrushContainer(@Nullable UUID uuid, Configuration configuration, QueryFactoryHolder factoryHolder) {
+        super(uuid, configuration, factoryHolder);
     }
 
     @Override

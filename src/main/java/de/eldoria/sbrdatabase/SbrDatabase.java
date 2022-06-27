@@ -28,6 +28,7 @@ import de.eldoria.sbrdatabase.dao.mysql.MySqlPresets;
 import de.eldoria.sbrdatabase.dao.postgres.PostgresPresets;
 import de.eldoria.schematicbrush.SchematicBrushReborn;
 import de.eldoria.schematicbrush.brush.config.util.Nameable;
+import de.eldoria.schematicbrush.storage.Storage;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 import java.io.IOException;
@@ -38,6 +39,9 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
 public class SbrDatabase extends EldoPlugin {
+    private static final Nameable mariadb = Nameable.of("mariadb");
+    private static final Nameable mysql = Nameable.of("mysql");
+    private static final Nameable postgres = Nameable.of("postgres");
     private final Thread.UncaughtExceptionHandler exceptionHandler = (thread, err) -> logger().log(Level.SEVERE, "Unhandled exception occured in thread " + thread.getName() + "-" + thread.getId(), err);
 
     private final ExecutorService executor = Executors.newCachedThreadPool(run -> {
@@ -97,13 +101,14 @@ public class SbrDatabase extends EldoPlugin {
         var dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.MARIADB)
                 .configure(config -> applyBaseDb(storages.mariadb(), config))
                 .create())
+                .withMaximumPoolSize(storages.mariadb().connections())
                 .build();
         SqlUpdater.builder(dataSource, SqlType.MARIADB)
                 .withLogger(LoggerAdapter.wrap(logger()))
                 .setVersionTable("sbr_version")
                 .execute();
-        sbr.storageRegistry().register(Nameable.of("mariadb"),
-                new BaseStorage(new MariaDbPresets(dataSource), new MariaDbBrushes(dataSource)));
+        sbr.storageRegistry().register(mariadb,
+                new BaseStorage(new MariaDbPresets(dataSource,configuration), new MariaDbBrushes(dataSource,configuration)));
     }
 
     private void setupMySql() throws IOException, SQLException {
@@ -111,35 +116,37 @@ public class SbrDatabase extends EldoPlugin {
         var dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.MYSQL)
                 .configure(config -> applyBaseDb(storages.mysql(), config))
                 .create())
+                .withMaximumPoolSize(storages.mysql().connections())
                 .build();
         SqlUpdater.builder(dataSource, SqlType.MYSQL)
                 .withLogger(LoggerAdapter.wrap(logger()))
                 .setVersionTable("sbr_version")
                 .execute();
-        sbr.storageRegistry().register(Nameable.of("mysql"),
-                new BaseStorage(new MySqlPresets(dataSource), new MySqlBrushes(dataSource)));
+        sbr.storageRegistry().register(mysql,
+                new BaseStorage(new MySqlPresets(dataSource, configuration), new MySqlBrushes(dataSource, configuration)));
     }
 
     private void setupPostgres() throws IOException, SQLException {
         var storages = configuration.storages();
-        var postgres = storages.postgres();
+        var db = storages.postgres();
         var dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.POSTGRES)
-                .configure(config -> applyBaseDb(postgres, config)).create())
+                .configure(config -> applyBaseDb(db, config)).create())
                 .build();
         SqlUpdater.builder(dataSource, SqlType.POSTGRES)
                 .withLogger(LoggerAdapter.wrap(logger()))
-                .setReplacements(new QueryReplacement("sbr_database", postgres.schema()))
-                .setSchemas(postgres.schema())
+                .setReplacements(new QueryReplacement("sbr_database", db.schema()))
+                .setSchemas(db.schema())
                 .setVersionTable("sbr_version")
                 .execute();
         dataSource.close();
         dataSource = applyHikariSettings(DataSourceCreator.create(SqlType.POSTGRES)
-                .configure(config -> applyBaseDb(postgres, config))
+                .configure(config -> applyBaseDb(db, config))
                 .create())
-                .forSchema(postgres.schema())
+                .withMaximumPoolSize(db.connections())
+                .forSchema(db.schema())
                 .build();
-        sbr.storageRegistry().register(Nameable.of("postgres"),
-                new BaseStorage(new PostgresPresets(dataSource), new PostgresBrushes(dataSource)));
+        sbr.storageRegistry().register(postgres,
+                new BaseStorage(new PostgresPresets(dataSource, configuration), new PostgresBrushes(dataSource,configuration)));
     }
 
     private <T extends RemoteJdbcConfig<T>> void applyBaseDb(BaseDbConfig config, RemoteJdbcConfig<T> remote) {
