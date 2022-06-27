@@ -62,15 +62,6 @@ public class SbrDatabase extends EldoPlugin {
     }
 
     @Override
-    public void onPluginEnable() throws Throwable {
-    }
-
-    @Override
-    public void onPostStart() throws Throwable {
-
-    }
-
-    @Override
     public void onPluginDisable() throws Throwable {
         executor.shutdown();
     }
