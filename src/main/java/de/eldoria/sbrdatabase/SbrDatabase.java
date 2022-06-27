@@ -16,6 +16,7 @@ import de.chojo.sqlutil.updater.SqlUpdater;
 import de.chojo.sqlutil.wrapper.QueryBuilderConfig;
 import de.eldoria.eldoutilities.plugin.EldoPlugin;
 import de.eldoria.sbrdatabase.configuration.BaseDbConfig;
+import de.eldoria.sbrdatabase.configuration.Cache;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.configuration.PostgresDbConfig;
 import de.eldoria.sbrdatabase.configuration.Storages;
@@ -75,7 +76,7 @@ public class SbrDatabase extends EldoPlugin {
 
     @Override
     public List<Class<? extends ConfigurationSerializable>> getConfigSerialization() {
-        return List.of(Storages.class, BaseDbConfig.class, PostgresDbConfig.class);
+        return List.of(Storages.class, BaseDbConfig.class, PostgresDbConfig.class, Cache.class);
     }
 
     private void registerStorageTypes() throws IOException, SQLException {

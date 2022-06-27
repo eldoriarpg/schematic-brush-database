@@ -26,6 +26,7 @@ public class Configuration extends EldoConfig {
     @Override
     protected void saveConfigs() {
         getConfig().set("storages", storages);
+        getConfig().set("cache", cache);
     }
 
     public Storages storages() {
