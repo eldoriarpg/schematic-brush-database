@@ -7,6 +7,8 @@
 package de.eldoria.sbrdatabase.configuration;
 
 import de.eldoria.eldoutilities.configuration.EldoConfig;
+import de.eldoria.sbrdatabase.configuration.elements.Cache;
+import de.eldoria.sbrdatabase.configuration.elements.Storages;
 import org.bukkit.plugin.Plugin;
 
 public class Configuration extends EldoConfig {

@@ -4,10 +4,12 @@
  *     Copyright (C) 2021 EldoriaRPG Team and Contributor
  */
 
-package de.eldoria.sbrdatabase.configuration;
+package de.eldoria.sbrdatabase.configuration.elements;
 
 import de.chojo.sqlutil.databases.SqlType;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
+import de.eldoria.sbrdatabase.configuration.elements.storages.BaseDbConfig;
+import de.eldoria.sbrdatabase.configuration.elements.storages.PostgresDbConfig;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.jetbrains.annotations.NotNull;

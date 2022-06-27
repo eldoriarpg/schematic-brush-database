@@ -4,7 +4,7 @@
  *     Copyright (C) 2021 EldoriaRPG Team and Contributor
  */
 
-package de.eldoria.sbrdatabase.configuration;
+package de.eldoria.sbrdatabase.configuration.elements.storages;
 
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
 import org.bukkit.configuration.serialization.SerializableAs;
