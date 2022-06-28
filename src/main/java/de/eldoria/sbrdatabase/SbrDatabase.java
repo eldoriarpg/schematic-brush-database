@@ -75,7 +75,7 @@ public class SbrDatabase extends EldoPlugin {
         var storages = configuration.storages();
         for (var sqlType : new SqlType<?>[]{SqlType.MYSQL, SqlType.POSTGRES, SqlType.MARIADB}) {
             if (!storages.isActive(sqlType)) continue;
-            logger().info("Setting up storage for " + sqlType.getName());
+            getLogger().info("Setting up storage for " + sqlType.getName());
             switch (sqlType.getName()) {
                 case "mariadb" -> setupMariaDb();
                 case "postgres" -> setupPostgres();
