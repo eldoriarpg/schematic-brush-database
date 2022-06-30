@@ -27,7 +27,7 @@ dependencies {
     compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.10")
 
     bukkitLibrary("org.postgresql", "postgresql", "42.4.0")
-    bukkitLibrary("org.mariadb.jdbc", "mariadb-java-client", "3.0.5")
+    bukkitLibrary("org.mariadb.jdbc", "mariadb-java-client", "3.0.6")
     bukkitLibrary("mysql", "mysql-connector-java", "8.0.29")
     bukkitLibrary("com.zaxxer", "HikariCP", "5.0.1")
 
