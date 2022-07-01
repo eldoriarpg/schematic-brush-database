@@ -82,10 +82,6 @@ public class MySqlPresetContainer extends BaseContainer<Preset> implements Prese
     }
 
     @Override
-    public void close() throws IOException {
-    }
-
-    @Override
     public CompletableFuture<Integer> size() {
         return builder(Integer.class).query("SELECT COUNT(1) FROM presets WHERE uuid = ?")
                 .paramsBuilder(stmt -> stmt.setBytes(uuidBytes()))

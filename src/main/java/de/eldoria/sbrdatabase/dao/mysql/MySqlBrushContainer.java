@@ -85,11 +85,6 @@ public class MySqlBrushContainer extends BaseContainer<Brush> implements BrushCo
                 .readRow(resultSet -> resultSet.getString("name"))
                 .all();
     }
-
-    @Override
-    public void close() throws IOException {
-    }
-
     @Override
     public CompletableFuture<Integer> size() {
         return builder(Integer.class).query("SELECT COUNT(1) FROM brushes WHERE uuid = ?")
