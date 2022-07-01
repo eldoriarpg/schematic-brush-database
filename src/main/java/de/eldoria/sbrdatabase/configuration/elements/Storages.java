@@ -10,6 +10,7 @@ import de.chojo.sqlutil.databases.SqlType;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
 import de.eldoria.sbrdatabase.configuration.elements.storages.BaseDbConfig;
 import de.eldoria.sbrdatabase.configuration.elements.storages.PostgresDbConfig;
+import de.eldoria.schematicbrush.brush.config.util.Nameable;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.jetbrains.annotations.NotNull;
@@ -64,7 +65,7 @@ public class Storages implements ConfigurationSerializable {
         return postgres;
     }
 
-    public boolean isActive(SqlType<?> type) {
-        return activeTypes.stream().anyMatch(t -> t.equalsIgnoreCase(type.getName()));
+    public boolean isActive(Nameable type) {
+        return activeTypes.stream().anyMatch(t -> t.equalsIgnoreCase(type.name()));
     }
 }

@@ -54,5 +54,4 @@ public class PostgresBrushContainer extends MySqlBrushContainer {
                 .execute()
                 .thenApply(i -> i == 1);
     }
-
 }

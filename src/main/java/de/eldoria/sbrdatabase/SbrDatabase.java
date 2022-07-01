@@ -39,6 +39,7 @@ public class SbrDatabase extends EldoPlugin {
     private static final Nameable mariadb = Nameable.of("mariadb");
     private static final Nameable mysql = Nameable.of("mysql");
     private static final Nameable postgres = Nameable.of("postgres");
+    public static final Nameable[] sqlTypes = {mariadb, mysql, postgres};
     private final Thread.UncaughtExceptionHandler exceptionHandler = (thread, err) -> logger().log(Level.SEVERE, "Unhandled exception occured in thread " + thread.getName() + "-" + thread.getId(), err);
 
     private final ExecutorService executor = Executors.newCachedThreadPool(run -> {
@@ -73,10 +74,10 @@ public class SbrDatabase extends EldoPlugin {
 
     private void registerStorageTypes() throws IOException, SQLException {
         var storages = configuration.storages();
-        for (var sqlType : new SqlType<?>[]{SqlType.MYSQL, SqlType.POSTGRES, SqlType.MARIADB}) {
+        for (var sqlType : sqlTypes) {
             if (!storages.isActive(sqlType)) continue;
-            getLogger().info("Setting up storage for " + sqlType.getName());
-            switch (sqlType.getName()) {
+            getLogger().info("Setting up storage for " + sqlType);
+            switch (sqlType.name()) {
                 case "mariadb" -> setupMariaDb();
                 case "postgres" -> setupPostgres();
                 case "mysql" -> setupMySql();

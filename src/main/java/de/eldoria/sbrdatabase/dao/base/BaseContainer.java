@@ -12,6 +12,9 @@ import de.eldoria.eldoutilities.serialization.wrapper.YamlContainer;
 import de.eldoria.eldoutilities.utils.Futures;
 import de.eldoria.sbrdatabase.SbrDatabase;
 import de.eldoria.sbrdatabase.configuration.Configuration;
+import de.eldoria.schematicbrush.storage.ContainerPagedAccess;
+import de.eldoria.schematicbrush.storage.base.Container;
+import de.eldoria.schematicbrush.storage.brush.Brush;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.Nullable;
@@ -21,12 +24,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-public abstract class BaseContainer extends QueryFactoryHolder {
+public abstract class BaseContainer<T> extends QueryFactoryHolder implements Container<T> {
     private static final UUID GLOBAL = new UUID(0, 0);
     private final UUID uuid;
     private final Configuration configuration;
@@ -71,5 +75,12 @@ public abstract class BaseContainer extends QueryFactoryHolder {
 
     public byte[] uuidBytes() {
         return UUIDConverter.convert(uuid);
+    }
+
+    public abstract CompletableFuture<List<T>> page(int page, int size);
+
+    @Override
+    public CompletableFuture<ContainerPagedAccess<T>> paged() {
+        return size().thenApply(size -> new DbContainerPagedAccess<>(this, size));
     }
 }
