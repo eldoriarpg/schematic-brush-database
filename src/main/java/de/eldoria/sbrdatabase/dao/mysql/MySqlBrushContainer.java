@@ -9,6 +9,8 @@ package de.eldoria.sbrdatabase.dao.mysql;
 import de.chojo.sqlutil.base.QueryFactoryHolder;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BaseContainer;
+import de.eldoria.sbrdatabase.dao.base.DbContainerPagedAccess;
+import de.eldoria.schematicbrush.storage.ContainerPagedAccess;
 import de.eldoria.schematicbrush.storage.brush.Brush;
 import de.eldoria.schematicbrush.storage.brush.BrushContainer;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +22,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public class MySqlBrushContainer extends BaseContainer implements BrushContainer {
+public class MySqlBrushContainer extends BaseContainer<Brush> implements BrushContainer {
 
     public MySqlBrushContainer(@Nullable UUID uuid, Configuration configuration, QueryFactoryHolder factoryHolder) {
         super(uuid, configuration, factoryHolder);
@@ -28,11 +30,20 @@ public class MySqlBrushContainer extends BaseContainer implements BrushContainer
 
     @Override
     public CompletableFuture<Optional<Brush>> get(String name) {
-        return builder(Brush.class).query("SELECT preset FROM presets WHERE uuid = ? AND name LIKE ?")
+        return builder(Brush.class).query("SELECT brush FROM brushes WHERE uuid = ? AND name LIKE ?")
                 .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
                         .setString(name))
-                .readRow(rs -> yamlToObject(rs.getString("preset"), Brush.class))
+                .readRow(rs -> yamlToObject(rs.getString("brush"), Brush.class))
                 .first();
+    }
+
+    public CompletableFuture<List<Brush>> page(int page, int size) {
+        return builder(Brush.class).query("SELECT brush FROM brushes WHERE uuid = ? ORDER BY name LIMIT ? OFFSET ?")
+                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
+                        .setInt(size)
+                        .setInt(size * page))
+                .readRow(rs -> yamlToObject(rs.getString("brush"), Brush.class))
+                .all();
     }
 
     @Override
@@ -50,7 +61,8 @@ public class MySqlBrushContainer extends BaseContainer implements BrushContainer
 
     @Override
     public CompletableFuture<Collection<Brush>> all() {
-        return builder(Brush.class).queryWithoutParams("SELECT uuid, name, brush FROM brushes")
+        return builder(Brush.class).query("SELECT uuid, name, brush FROM brushes WHERE uuid = ?")
+                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes()))
                 .readRow(resultSet -> yamlToObject(resultSet.getString("preset"), Brush.class))
                 .all()
                 .thenApply(list -> list);
@@ -68,12 +80,16 @@ public class MySqlBrushContainer extends BaseContainer implements BrushContainer
 
     @Override
     protected CompletableFuture<List<String>> retrieveNames() {
-        return builder(String.class).queryWithoutParams("SELECT name FROM brushes")
+        return builder(String.class).query("SELECT name FROM brushes WHERE uuid = ?")
+                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes()))
                 .readRow(resultSet -> resultSet.getString("name"))
                 .all();
     }
-
     @Override
-    public void close() throws IOException {
+    public CompletableFuture<Integer> size() {
+        return builder(Integer.class).query("SELECT COUNT(1) FROM brushes WHERE uuid = ?")
+                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes()))
+                .readRow(rs -> rs.getInt("count"))
+                .first().thenApply(e -> e.orElse(0));
     }
 }

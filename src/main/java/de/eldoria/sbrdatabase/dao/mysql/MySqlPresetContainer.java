@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public class MySqlPresetContainer extends BaseContainer implements PresetContainer {
+public class MySqlPresetContainer extends BaseContainer<Preset> implements PresetContainer {
 
     public MySqlPresetContainer(@Nullable UUID uuid, Configuration configuration, QueryFactoryHolder factoryHolder) {
         super(uuid, configuration, factoryHolder);
@@ -33,6 +33,16 @@ public class MySqlPresetContainer extends BaseContainer implements PresetContain
                         .setString(name))
                 .readRow(resultSet -> yamlToObject(resultSet.getString("preset"), Preset.class))
                 .first();
+    }
+
+    @Override
+    public CompletableFuture<List<Preset>> page(int page, int size) {
+        return builder(Preset.class).query("SELECT preset FROM presets WHERE uuid = ? ORDER BY name LIMIT ? OFFSET ?")
+                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
+                        .setInt(size)
+                        .setInt(size * page))
+                .readRow(rs -> yamlToObject(rs.getString("preset"), Preset.class))
+                .all();
     }
 
     @Override
@@ -72,6 +82,10 @@ public class MySqlPresetContainer extends BaseContainer implements PresetContain
     }
 
     @Override
-    public void close() throws IOException {
+    public CompletableFuture<Integer> size() {
+        return builder(Integer.class).query("SELECT COUNT(1) FROM presets WHERE uuid = ?")
+                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes()))
+                .readRow(rs -> rs.getInt("count"))
+                .first().thenApply(e -> e.orElse(0));
     }
 }
