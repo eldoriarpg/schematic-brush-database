@@ -10,6 +10,8 @@ import de.chojo.sqlutil.base.QueryFactoryHolder;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.mysql.MySqlBrushContainer;
 import de.eldoria.schematicbrush.storage.brush.Brush;
+import de.eldoria.schematicbrush.storage.brush.Brushes;
+import de.eldoria.schematicbrush.storage.preset.Preset;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -24,7 +26,7 @@ public class PostgresBrushContainer extends MySqlBrushContainer {
 
     @Override
     public CompletableFuture<Void> add(Brush preset) {
-        return builder().query("INSERT INTO brushes(uuid, name, brush) VALUES(?, ?, ?) ON CONFLICT(uuid, NAME) DO UPDATE SET brush = excluded.brush")
+        return builder().query("INSERT INTO brushes(uuid, name, brush) VALUES(?, ?, ?) ON CONFLICT(uuid, name) DO UPDATE SET brush = excluded.brush")
                 .paramsBuilder(stmt ->
                         stmt.setBytes(uuidBytes())
                                 .setString(preset.name())

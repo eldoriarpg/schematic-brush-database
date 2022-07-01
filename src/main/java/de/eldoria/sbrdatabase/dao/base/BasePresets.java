@@ -23,8 +23,8 @@ public abstract class BasePresets extends QueryFactoryHolder implements Presets 
             .expireAfterAccess(5, TimeUnit.MINUTES)
             .maximumSize(50)
             .build();
-    private final Configuration configuration;
     private PresetContainer global;
+    private final Configuration configuration;
 
     public BasePresets(DataSource dataSource, Configuration configuration) {
         super(dataSource);

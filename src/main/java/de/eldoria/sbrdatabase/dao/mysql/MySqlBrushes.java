@@ -46,6 +46,6 @@ public class MySqlBrushes extends BaseBrushes {
 
     @Override
     public BrushContainer getContainer(UUID uuid) {
-        return new MySqlBrushContainer(uuid, configuration(), this);
+        return new MySqlBrushContainer(uuid,  configuration(),this);
     }
 }
