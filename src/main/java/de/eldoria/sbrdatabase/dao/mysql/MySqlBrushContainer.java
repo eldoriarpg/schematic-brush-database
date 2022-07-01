@@ -9,8 +9,6 @@ package de.eldoria.sbrdatabase.dao.mysql;
 import de.chojo.sqlutil.base.QueryFactoryHolder;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BaseContainer;
-import de.eldoria.sbrdatabase.dao.base.DbContainerPagedAccess;
-import de.eldoria.schematicbrush.storage.ContainerPagedAccess;
 import de.eldoria.schematicbrush.storage.brush.Brush;
 import de.eldoria.schematicbrush.storage.brush.BrushContainer;
 import org.jetbrains.annotations.Nullable;
@@ -30,19 +28,19 @@ public class MySqlBrushContainer extends BaseContainer<Brush> implements BrushCo
 
     @Override
     public CompletableFuture<Optional<Brush>> get(String name) {
-        return builder(Brush.class).query("SELECT preset FROM presets WHERE uuid = ? AND name LIKE ?")
+        return builder(Brush.class).query("SELECT brush FROM brushes WHERE uuid = ? AND name LIKE ?")
                 .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
                         .setString(name))
-                .readRow(rs -> yamlToObject(rs.getString("preset"), Brush.class))
+                .readRow(rs -> yamlToObject(rs.getString("brush"), Brush.class))
                 .first();
     }
 
     public CompletableFuture<List<Brush>> page(int page, int size) {
-        return builder(Brush.class).query("SELECT preset FROM presets WHERE uuid = ? ORDER BY name LIMIT ? OFFSET ?")
+        return builder(Brush.class).query("SELECT brush FROM brushes WHERE uuid = ? ORDER BY name LIMIT ? OFFSET ?")
                 .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
                         .setInt(size)
                         .setInt(size * page))
-                .readRow(rs -> yamlToObject(rs.getString("preset"), Brush.class))
+                .readRow(rs -> yamlToObject(rs.getString("brush"), Brush.class))
                 .all();
     }
 

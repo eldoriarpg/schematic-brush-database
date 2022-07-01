@@ -6,11 +6,13 @@
 
 package de.eldoria.sbrdatabase.dao.base;
 
+import de.eldoria.sbrdatabase.SbrDatabase;
 import de.eldoria.schematicbrush.storage.ContainerPagedAccess;
-import de.eldoria.schematicbrush.storage.base.Container;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 public class DbContainerPagedAccess<T> implements ContainerPagedAccess<T> {
     private final BaseContainer<T> container;
@@ -29,6 +31,9 @@ public class DbContainerPagedAccess<T> implements ContainerPagedAccess<T> {
 
     @Override
     public CompletableFuture<List<T>> page(int page, int size) {
-        return container.page(page, size);
+        return container.page(page, size).exceptionally(err -> {
+            SbrDatabase.logger().log(Level.SEVERE, "Could not retrieve page", err);
+            return Collections.emptyList();
+        });
     }
 }

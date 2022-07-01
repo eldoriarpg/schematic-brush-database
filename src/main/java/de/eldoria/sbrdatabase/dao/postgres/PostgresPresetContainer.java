@@ -24,7 +24,7 @@ public class PostgresPresetContainer extends MySqlPresetContainer {
 
     @Override
     public CompletableFuture<Void> add(Preset preset) {
-        return builder().query("INSERT INTO presets(uuid, name, preset) VALUES(?, ?, ?) ON CONFLICT(uuid, name) DO UPDATE SET preset = excluded.preset")
+        return builder().query("INSERT INTO presets(uuid, name, preset) VALUES(?, ?, ?) ON CONFLICT(uuid, NAME) DO UPDATE SET preset = excluded.preset")
                 .paramsBuilder(stmt ->
                         stmt.setBytes(uuidBytes())
                                 .setString(preset.name())

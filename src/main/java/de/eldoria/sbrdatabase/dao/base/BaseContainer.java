@@ -14,7 +14,6 @@ import de.eldoria.sbrdatabase.SbrDatabase;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.schematicbrush.storage.ContainerPagedAccess;
 import de.eldoria.schematicbrush.storage.base.Container;
-import de.eldoria.schematicbrush.storage.brush.Brush;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +23,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -80,7 +78,11 @@ public abstract class BaseContainer<T> extends QueryFactoryHolder implements Con
     public abstract CompletableFuture<List<T>> page(int page, int size);
 
     @Override
-    public CompletableFuture<ContainerPagedAccess<T>> paged() {
-        return size().thenApply(size -> new DbContainerPagedAccess<>(this, size));
+    public CompletableFuture<? extends ContainerPagedAccess<T>> paged() {
+        return size().thenApply(size -> new DbContainerPagedAccess<>(this, size))
+                .exceptionally(err -> {
+                    SbrDatabase.logger().log(Level.SEVERE, "Could not build paged access", err);
+                    return new DbContainerPagedAccess<>(this, 0);
+                });
     }
 }
