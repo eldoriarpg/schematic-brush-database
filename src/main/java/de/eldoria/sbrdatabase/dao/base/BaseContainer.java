@@ -16,6 +16,7 @@ import de.eldoria.schematicbrush.storage.ContainerPagedAccess;
 import de.eldoria.schematicbrush.storage.base.Container;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
@@ -29,7 +30,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public abstract class BaseContainer<T> extends QueryFactoryHolder implements Container<T> {
-    private static final UUID GLOBAL = new UUID(0, 0);
+    @NotNull
     private final UUID uuid;
     private final Configuration configuration;
     private Set<String> names = Collections.emptySet();
@@ -37,11 +38,11 @@ public abstract class BaseContainer<T> extends QueryFactoryHolder implements Con
 
     public BaseContainer(@Nullable UUID uuid, Configuration configuration, QueryFactoryHolder factoryHolder) {
         super(factoryHolder);
-        this.uuid = uuid == null ? GLOBAL : uuid;
+        this.uuid = uuid == null ? Container.GLOBAL : uuid;
         this.configuration = configuration;
     }
 
-    protected <T extends ConfigurationSerializable> T yamlToObject(String preset, Class<T> clazz) {
+    protected <V extends ConfigurationSerializable> V yamlToObject(String preset, Class<V> clazz) {
         try {
             return YamlContainer.yamlToObject(preset, clazz);
         } catch (InvalidConfigurationException e) {
@@ -50,7 +51,7 @@ public abstract class BaseContainer<T> extends QueryFactoryHolder implements Con
         }
     }
 
-    protected <T extends ConfigurationSerializable> String presetToYaml(T preset) {
+    protected <V extends ConfigurationSerializable> String presetToYaml(V preset) {
         return YamlContainer.objectToYaml(preset);
     }
 
@@ -67,10 +68,6 @@ public abstract class BaseContainer<T> extends QueryFactoryHolder implements Con
 
     protected abstract CompletableFuture<List<String>> retrieveNames();
 
-    public UUID uuid() {
-        return uuid;
-    }
-
     public byte[] uuidBytes() {
         return UUIDConverter.convert(uuid);
     }
@@ -84,5 +81,10 @@ public abstract class BaseContainer<T> extends QueryFactoryHolder implements Con
                     SbrDatabase.logger().log(Level.SEVERE, "Could not build paged access", err);
                     return new DbContainerPagedAccess<>(this, 0);
                 });
+    }
+
+    @Override
+    public @NotNull UUID owner() {
+        return uuid;
     }
 }

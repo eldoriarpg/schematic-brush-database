@@ -21,6 +21,6 @@ public class MariaDbPresets extends MySqlPresets {
 
     @Override
     public PresetContainer getContainer(UUID uuid) {
-        return new MariaDbPresetContainer(uuid, configuration(),this);
+        return new MariaDbPresetContainer(uuid, configuration(), this);
     }
 }

@@ -46,6 +46,6 @@ public class MySqlPresets extends BasePresets {
 
     @Override
     public PresetContainer getContainer(UUID uuid) {
-        return new MySqlPresetContainer(uuid,  configuration(),this);
+        return new MySqlPresetContainer(uuid, configuration(), this);
     }
 }

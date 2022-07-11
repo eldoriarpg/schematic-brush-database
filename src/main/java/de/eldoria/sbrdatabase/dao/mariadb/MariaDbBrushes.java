@@ -20,6 +20,6 @@ public class MariaDbBrushes extends MySqlBrushes {
 
     @Override
     public BrushContainer getContainer(UUID uuid) {
-        return new MariaDbBrushContainer(uuid, configuration(),this);
+        return new MariaDbBrushContainer(uuid, configuration(), this);
     }
 }

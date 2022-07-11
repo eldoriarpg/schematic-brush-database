@@ -13,7 +13,6 @@ import de.eldoria.schematicbrush.storage.preset.Preset;
 import de.eldoria.schematicbrush.storage.preset.PresetContainer;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;

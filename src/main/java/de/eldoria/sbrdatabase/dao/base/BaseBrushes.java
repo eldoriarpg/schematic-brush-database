@@ -23,8 +23,8 @@ public abstract class BaseBrushes extends QueryFactoryHolder implements Brushes 
             .expireAfterAccess(5, TimeUnit.MINUTES)
             .maximumSize(50)
             .build();
-    private BrushContainer global;
     private final Configuration configuration;
+    private BrushContainer global;
 
     public BaseBrushes(DataSource dataSource, Configuration configuration) {
         super(dataSource);

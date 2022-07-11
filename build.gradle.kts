@@ -20,9 +20,11 @@ repositories {
 dependencies {
     implementation("de.chojo", "sql-util", "1.4.6"){
         exclude("com.zaxxer")
+        exclude("org.slf4j")
+        exclude("org.jetbrains")
     }
 
-    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.2.0")
+    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.2.2")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.10")
 
@@ -92,10 +94,13 @@ tasks {
     }
 
     shadowJar {
+        relocate("de.chojo.sqlutil", "de.eldoria.sbrdatabase.libs.sqlutil")
         relocate("de.eldoria.eldoutilities", "de.eldoria.schematicbrush.libs.eldoutilities")
         relocate("de.eldoria.messageblocker", "de.eldoria.schematicbrush.libs.messageblocker")
         relocate("net.kyori", "de.eldoria.schematicbrush.libs.kyori")
         mergeServiceFiles()
+        archiveClassifier.set("")
+        archiveBaseName.set("SchematicBrushDatabase")
     }
 
     processResources {

@@ -10,8 +10,6 @@ import de.chojo.sqlutil.base.QueryFactoryHolder;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.mysql.MySqlBrushContainer;
 import de.eldoria.schematicbrush.storage.brush.Brush;
-import de.eldoria.schematicbrush.storage.brush.Brushes;
-import de.eldoria.schematicbrush.storage.preset.Preset;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;

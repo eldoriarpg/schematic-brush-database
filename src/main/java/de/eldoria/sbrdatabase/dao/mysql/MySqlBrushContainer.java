@@ -9,13 +9,10 @@ package de.eldoria.sbrdatabase.dao.mysql;
 import de.chojo.sqlutil.base.QueryFactoryHolder;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BaseContainer;
-import de.eldoria.sbrdatabase.dao.base.DbContainerPagedAccess;
-import de.eldoria.schematicbrush.storage.ContainerPagedAccess;
 import de.eldoria.schematicbrush.storage.brush.Brush;
 import de.eldoria.schematicbrush.storage.brush.BrushContainer;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -85,6 +82,7 @@ public class MySqlBrushContainer extends BaseContainer<Brush> implements BrushCo
                 .readRow(resultSet -> resultSet.getString("name"))
                 .all();
     }
+
     @Override
     public CompletableFuture<Integer> size() {
         return builder(Integer.class).query("SELECT COUNT(1) FROM brushes WHERE uuid = ?")
