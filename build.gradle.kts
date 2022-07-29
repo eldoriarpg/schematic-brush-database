@@ -1,8 +1,7 @@
 plugins {
     id("org.cadixdev.licenser") version "0.6.1"
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("de.chojo.publishdata") version "1.0.4"
-    id("de.nycode.spigot-dependency-loader") version "1.1.2"
+    id("de.chojo.publishdata") version "1.0.8"
     id("net.minecrell.plugin-yml.bukkit") version "0.5.2"
     java
     `maven-publish`
@@ -19,24 +18,26 @@ repositories {
 }
 
 dependencies {
-    implementation("de.chojo", "sql-util", "1.4.4"){
+    implementation("de.chojo", "sql-util", "1.4.6"){
         exclude("com.zaxxer")
+        exclude("org.slf4j")
+        exclude("org.jetbrains")
     }
 
-    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.1.9-SNAPSHOT")
+    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.2.3")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.10")
 
-    spigot("org.postgresql", "postgresql", "42.4.0")
-    spigot("com.fasterxml.jackson.core", "jackson-databind", "2.0.1")
-    spigot("org.mariadb.jdbc", "mariadb-java-client", "3.0.5")
-    spigot("mysql", "mysql-connector-java", "8.0.29")
-    spigot("com.zaxxer", "HikariCP", "5.0.1")
+    bukkitLibrary("org.postgresql", "postgresql", "42.4.0")
+    bukkitLibrary("org.mariadb.jdbc", "mariadb-java-client", "3.0.6")
+    bukkitLibrary("mysql", "mysql-connector-java", "8.0.30")
+    bukkitLibrary("com.zaxxer", "HikariCP", "5.0.1")
 
-    testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.8.2")
+    testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.0")
     testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
-    testImplementation("de.eldoria", "eldo-util", "1.13.5")
+    testImplementation("de.eldoria", "eldo-util", "1.13.9")
     testImplementation("com.fasterxml.jackson.core", "jackson-databind", "2.0.1")
+
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine")
 }
 
@@ -53,7 +54,9 @@ java {
 
 publishData {
     useEldoNexusRepos()
-    publishComponent("java")
+    publishTask("shadowJar")
+    publishTask("javadocJar")
+    publishTask("sourcesJar")
 }
 
 publishing {
@@ -93,10 +96,13 @@ tasks {
     }
 
     shadowJar {
+        relocate("de.chojo.sqlutil", "de.eldoria.sbrdatabase.libs.sqlutil")
         relocate("de.eldoria.eldoutilities", "de.eldoria.schematicbrush.libs.eldoutilities")
         relocate("de.eldoria.messageblocker", "de.eldoria.schematicbrush.libs.messageblocker")
         relocate("net.kyori", "de.eldoria.schematicbrush.libs.kyori")
         mergeServiceFiles()
+        archiveClassifier.set("")
+        archiveBaseName.set("SchematicBrushDatabase")
     }
 
     processResources {
@@ -126,9 +132,12 @@ tasks {
     }
 }
 
-bukkit{
+
+bukkit {
+    name = "SchematicBrushDatabase"
     main = "de.eldoria.sbrdatabase.SbrDatabase"
     apiVersion = "1.16"
+    version = publishData.getVersion(true)
     authors = listOf("RainbowDashLabs")
     depend = listOf("SchematicBrushReborn")
 }
