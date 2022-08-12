@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    implementation("de.chojo", "sql-util", "1.4.6"){
+    implementation("de.chojo", "sql-util", "1.5.0"){
         exclude("com.zaxxer")
         exclude("org.slf4j")
         exclude("org.jetbrains")
