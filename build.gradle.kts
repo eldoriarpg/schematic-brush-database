@@ -33,7 +33,7 @@ dependencies {
     bukkitLibrary("mysql", "mysql-connector-java", "8.0.30")
     bukkitLibrary("com.zaxxer", "HikariCP", "5.0.1")
 
-    testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.0")
+    testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.1")
     testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     testImplementation("de.eldoria", "eldo-util", "1.13.9")
     testImplementation("com.fasterxml.jackson.core", "jackson-databind", "2.13.4")
