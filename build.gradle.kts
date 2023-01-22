@@ -36,7 +36,7 @@ dependencies {
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.1")
     testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     testImplementation("de.eldoria", "eldo-util", "1.14.0")
-    testImplementation("com.fasterxml.jackson.core", "jackson-databind", "2.14.0")
+    testImplementation("com.fasterxml.jackson.core", "jackson-databind", "2.14.1")
 
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine")
 }
