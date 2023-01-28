@@ -24,7 +24,7 @@ dependencies {
         exclude("org.jetbrains")
     }
 
-    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.3.1")
+    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.3.2")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.13")
 
