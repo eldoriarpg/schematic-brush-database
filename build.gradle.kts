@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "de.eldoria"
-version = "1.0.0"
+version = "1.0.1"
 val shadebase = "de.eldoria." + rootProject.name + ".libs."
 
 repositories {
