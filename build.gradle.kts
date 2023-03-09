@@ -1,14 +1,14 @@
 plugins {
     id("org.cadixdev.licenser") version "0.6.1"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("de.chojo.publishdata") version "1.0.8"
-    id("net.minecrell.plugin-yml.bukkit") version "0.5.2"
+    id("com.github.johnrengelman.shadow") version "8.1.0"
+    id("de.chojo.publishdata") version "1.1.0"
+    id("net.minecrell.plugin-yml.bukkit") version "0.5.3"
     java
     `maven-publish`
 }
 
 group = "de.eldoria"
-version = "1.0.0"
+version = "1.0.1"
 val shadebase = "de.eldoria." + rootProject.name + ".libs."
 
 repositories {
@@ -18,25 +18,25 @@ repositories {
 }
 
 dependencies {
-    implementation("de.chojo", "sql-util", "1.4.6"){
+    implementation("de.chojo", "sql-util", "1.5.0"){
         exclude("com.zaxxer")
         exclude("org.slf4j")
         exclude("org.jetbrains")
     }
 
-    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.2.3")
+    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.4.2")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
-    compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.10")
+    compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.13")
 
-    bukkitLibrary("org.postgresql", "postgresql", "42.4.0")
-    bukkitLibrary("org.mariadb.jdbc", "mariadb-java-client", "3.0.6")
-    bukkitLibrary("mysql", "mysql-connector-java", "8.0.30")
+    bukkitLibrary("org.postgresql", "postgresql", "42.5.4")
+    bukkitLibrary("org.mariadb.jdbc", "mariadb-java-client", "3.1.2")
+    bukkitLibrary("mysql", "mysql-connector-java", "8.0.32")
     bukkitLibrary("com.zaxxer", "HikariCP", "5.0.1")
 
-    testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.0")
+    testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.2")
     testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
-    testImplementation("de.eldoria", "eldo-util", "1.13.9")
-    testImplementation("com.fasterxml.jackson.core", "jackson-databind", "2.0.1")
+    testImplementation("de.eldoria", "eldo-util", "1.14.2")
+    testImplementation("com.fasterxml.jackson.core", "jackson-databind", "2.14.2")
 
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine")
 }
