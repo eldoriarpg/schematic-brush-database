@@ -53,6 +53,7 @@ java {
 }
 
 publishData {
+    addBuildData()
     useEldoNexusRepos()
     publishTask("shadowJar")
     publishTask("javadocJar")
