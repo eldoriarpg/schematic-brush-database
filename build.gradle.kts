@@ -1,7 +1,7 @@
 plugins {
     id("org.cadixdev.licenser") version "0.6.1"
     id("com.github.johnrengelman.shadow") version "8.1.0"
-    id("de.chojo.publishdata") version "1.1.0"
+    id("de.chojo.publishdata") version "1.2.1"
     id("net.minecrell.plugin-yml.bukkit") version "0.5.3"
     java
     `maven-publish`
@@ -53,6 +53,7 @@ java {
 }
 
 publishData {
+    addBuildData()
     useEldoNexusRepos()
     publishTask("shadowJar")
     publishTask("javadocJar")
