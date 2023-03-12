@@ -18,11 +18,18 @@ repositories {
 }
 
 dependencies {
-    implementation("de.chojo", "sql-util", "1.5.0"){
-        exclude("com.zaxxer")
-        exclude("org.slf4j")
-        exclude("org.jetbrains")
+    implementation("de.chojo.sadu", "sadu-core", "1.2.0") {
+        exclude("org.jetbrains", "annotations")
+        exclude("org.slf4j", "slf4j-api")
     }
+    implementation("de.chojo.sadu", "sadu-queries", "1.2.0")
+    implementation("de.chojo.sadu", "sadu-datasource", "1.2.0") {
+        exclude("com.zaxxer")
+    }
+    implementation("de.chojo.sadu", "sadu-updater", "1.2.0")
+    implementation("de.chojo.sadu", "sadu-postgresql", "1.2.0")
+    implementation("de.chojo.sadu", "sadu-mariadb", "1.2.0")
+    implementation("de.chojo.sadu", "sadu-mysql", "1.2.0")
 
     compileOnly("de.eldoria", "schematicbrushreborn-api", "2.4.3")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")

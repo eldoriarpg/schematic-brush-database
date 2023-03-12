@@ -6,7 +6,6 @@
 
 package de.eldoria.sbrdatabase.dao.mysql;
 
-import de.chojo.sqlutil.conversion.UUIDConverter;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BaseBrushes;
 import de.eldoria.schematicbrush.storage.brush.BrushContainer;
@@ -30,14 +29,14 @@ public class MySqlBrushes extends BaseBrushes {
                         WHERE uuid IS NOT NULL
                         """)
                 .emptyParams()
-                .readRow(resultSet -> UUIDConverter.convert(resultSet.getBytes("uuid")))
+                .readRow(resultSet -> resultSet.getUuidFromBytes("uuid"))
                 .all()
                 .thenApply(uuids -> uuids.stream().collect(Collectors.toMap(uuid -> uuid, this::playerContainer)));
     }
 
     @Override
     public CompletableFuture<Integer> count() {
-        return builder(Integer.class).query("SELECT COUNT(1) FROM brushes;")
+        return builder(Integer.class).query("SELECT count(1) FROM brushes;")
                 .emptyParams()
                 .readRow(rs -> rs.getInt("count"))
                 .first()

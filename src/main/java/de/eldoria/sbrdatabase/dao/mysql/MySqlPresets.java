@@ -6,7 +6,6 @@
 
 package de.eldoria.sbrdatabase.dao.mysql;
 
-import de.chojo.sqlutil.conversion.UUIDConverter;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BasePresets;
 import de.eldoria.schematicbrush.storage.preset.PresetContainer;
@@ -30,14 +29,14 @@ public class MySqlPresets extends BasePresets {
                         WHERE uuid IS NOT NULL
                         """)
                 .emptyParams()
-                .readRow(resultSet -> UUIDConverter.convert(resultSet.getBytes("uuid")))
+                .readRow(resultSet -> resultSet.getUuidFromBytes("uuid"))
                 .all()
                 .thenApply(uuids -> uuids.stream().collect(Collectors.toMap(uuid -> uuid, this::playerContainer)));
     }
 
     @Override
     public CompletableFuture<Integer> count() {
-        return builder(Integer.class).query("SELECT COUNT(1) FROM presets;")
+        return builder(Integer.class).query("SELECT count(1) FROM presets;")
                 .emptyParams()
                 .readRow(rs -> rs.getInt("count"))
                 .first()

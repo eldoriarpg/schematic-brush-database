@@ -6,8 +6,7 @@
 
 package de.eldoria.sbrdatabase.dao.base;
 
-import de.chojo.sqlutil.base.QueryFactoryHolder;
-import de.chojo.sqlutil.conversion.UUIDConverter;
+import de.chojo.sadu.base.QueryFactory;
 import de.eldoria.eldoutilities.serialization.wrapper.YamlContainer;
 import de.eldoria.eldoutilities.utils.Futures;
 import de.eldoria.sbrdatabase.SbrDatabase;
@@ -29,14 +28,14 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-public abstract class BaseContainer<T> extends QueryFactoryHolder implements Container<T> {
+public abstract class BaseContainer<T> extends QueryFactory implements Container<T> {
     @NotNull
     private final UUID uuid;
     private final Configuration configuration;
     private Set<String> names = Collections.emptySet();
     private Instant lastRefresh = Instant.MIN;
 
-    public BaseContainer(@Nullable UUID uuid, Configuration configuration, QueryFactoryHolder factoryHolder) {
+    public BaseContainer(@Nullable UUID uuid, Configuration configuration, QueryFactory factoryHolder) {
         super(factoryHolder);
         this.uuid = uuid == null ? Container.GLOBAL : uuid;
         this.configuration = configuration;
@@ -67,10 +66,6 @@ public abstract class BaseContainer<T> extends QueryFactoryHolder implements Con
     }
 
     protected abstract CompletableFuture<List<String>> retrieveNames();
-
-    public byte[] uuidBytes() {
-        return UUIDConverter.convert(uuid);
-    }
 
     public abstract CompletableFuture<List<T>> page(int page, int size);
 

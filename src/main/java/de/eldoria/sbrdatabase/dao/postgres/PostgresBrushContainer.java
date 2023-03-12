@@ -6,7 +6,8 @@
 
 package de.eldoria.sbrdatabase.dao.postgres;
 
-import de.chojo.sqlutil.base.QueryFactoryHolder;
+import de.chojo.sadu.base.QueryFactory;
+import de.chojo.sadu.wrapper.util.UpdateResult;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.mysql.MySqlBrushContainer;
 import de.eldoria.schematicbrush.storage.brush.Brush;
@@ -18,26 +19,26 @@ import java.util.concurrent.CompletableFuture;
 
 public class PostgresBrushContainer extends MySqlBrushContainer {
 
-    public PostgresBrushContainer(@Nullable UUID uuid, Configuration configuration, QueryFactoryHolder factoryHolder) {
+    public PostgresBrushContainer(@Nullable UUID uuid, Configuration configuration, QueryFactory factoryHolder) {
         super(uuid, configuration, factoryHolder);
     }
 
     @Override
     public CompletableFuture<Void> add(Brush preset) {
         return builder().query("INSERT INTO brushes(uuid, name, brush) VALUES(?, ?, ?) ON CONFLICT(uuid, name) DO UPDATE SET brush = excluded.brush")
-                .paramsBuilder(stmt ->
-                        stmt.setBytes(uuidBytes())
+                .parameter(stmt ->
+                        stmt.setUuidAsBytes(owner())
                                 .setString(preset.name())
                                 .setString(presetToYaml(preset)))
                 .insert()
-                .execute()
+                .send()
                 .thenApply(r -> null);
     }
 
     @Override
     public CompletableFuture<Optional<Brush>> get(String name) {
         return builder(Brush.class).query("SELECT brush FROM brushes WHERE uuid = ? AND name ILIKE ?")
-                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
+                .parameter(stmt -> stmt.setUuidAsBytes(owner())
                         .setString(name))
                 .readRow(resultSet -> yamlToObject(resultSet.getString("brush"), Brush.class))
                 .first();
@@ -46,10 +47,10 @@ public class PostgresBrushContainer extends MySqlBrushContainer {
     @Override
     public CompletableFuture<Boolean> remove(String name) {
         return builder(Boolean.class).query("DELETE FROM brushes WHERE uuid = ? AND name ILIKE ?")
-                .paramsBuilder(stmt -> stmt.setBytes(uuidBytes())
+                .parameter(stmt -> stmt.setUuidAsBytes(owner())
                         .setString(name))
                 .delete()
-                .execute()
-                .thenApply(i -> i == 1);
+                .send()
+                .thenApply(UpdateResult::changed);
     }
 }
