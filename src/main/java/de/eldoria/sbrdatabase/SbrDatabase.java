@@ -15,6 +15,7 @@ import de.chojo.sqlutil.updater.QueryReplacement;
 import de.chojo.sqlutil.updater.SqlUpdater;
 import de.chojo.sqlutil.wrapper.QueryBuilderConfig;
 import de.eldoria.eldoutilities.plugin.EldoPlugin;
+import de.eldoria.eldoutilities.updater.Updater;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.configuration.elements.Cache;
 import de.eldoria.sbrdatabase.configuration.elements.Storages;
@@ -60,6 +61,11 @@ public class SbrDatabase extends EldoPlugin {
         configuration = new Configuration(this);
 
         registerStorageTypes();
+    }
+
+    @Override
+    public void onPostStart() throws Throwable {
+
     }
 
     @Override
