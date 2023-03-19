@@ -33,7 +33,7 @@ dependencies {
 
     compileOnly("de.eldoria", "schematicbrushreborn-api", "2.4.3")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
-    compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.13")
+    compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.14")
 
     bukkitLibrary("org.postgresql", "postgresql", "42.6.0")
     bukkitLibrary("org.mariadb.jdbc", "mariadb-java-client", "3.1.2")
