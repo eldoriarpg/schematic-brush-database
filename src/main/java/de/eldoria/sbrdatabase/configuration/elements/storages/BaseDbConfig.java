@@ -6,6 +6,8 @@
 
 package de.eldoria.sbrdatabase.configuration.elements.storages;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
@@ -21,6 +23,21 @@ public class BaseDbConfig implements ConfigurationSerializable {
     protected String user;
     protected String password;
     protected int connections;
+
+    @JsonCreator
+    public BaseDbConfig(@JsonProperty("host") String host,
+                        @JsonProperty("port") String port,
+                        @JsonProperty("database") String database,
+                        @JsonProperty("user") String user,
+                        @JsonProperty("password") String password,
+                        @JsonProperty("connections") int connections) {
+        this.host = host;
+        this.port = port;
+        this.database = database;
+        this.user = user;
+        this.password = password;
+        this.connections = connections;
+    }
 
     public BaseDbConfig() {
         connections = 3;

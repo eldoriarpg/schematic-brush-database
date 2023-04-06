@@ -6,6 +6,8 @@
 
 package de.eldoria.sbrdatabase.configuration.elements.storages;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +21,18 @@ public class PostgresDbConfig extends BaseDbConfig {
 
     public PostgresDbConfig() {
         port = "5432";
+    }
+
+    @JsonCreator
+    public PostgresDbConfig(@JsonProperty("host") String host,
+                            @JsonProperty("port") String port,
+                            @JsonProperty("database") String database,
+                            @JsonProperty("user") String user,
+                            @JsonProperty("password") String password,
+                            @JsonProperty("connections") int connections,
+                            @JsonProperty("schema") String schema) {
+        super(host, port, database, user, password, connections);
+        this.schema = schema;
     }
 
     public PostgresDbConfig(Map<String, Object> objectMap) {

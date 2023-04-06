@@ -6,6 +6,7 @@
 
 package de.eldoria.sbrdatabase.dao.postgres;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.chojo.sadu.base.QueryFactory;
 import de.chojo.sadu.wrapper.util.UpdateResult;
 import de.eldoria.sbrdatabase.configuration.Configuration;
@@ -19,8 +20,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class PostgresBrushContainer extends MySqlBrushContainer {
 
-    public PostgresBrushContainer(@Nullable UUID uuid, Configuration configuration, QueryFactory factoryHolder) {
-        super(uuid, configuration, factoryHolder);
+    public PostgresBrushContainer(@Nullable UUID uuid, Configuration configuration, QueryFactory factoryHolder, ObjectMapper mapper) {
+        super(uuid, configuration, factoryHolder, mapper);
     }
 
     @Override
@@ -29,7 +30,7 @@ public class PostgresBrushContainer extends MySqlBrushContainer {
                 .parameter(stmt ->
                         stmt.setUuidAsBytes(owner())
                                 .setString(preset.name())
-                                .setString(presetToYaml(preset)))
+                                .setString(parseToString(preset)))
                 .insert()
                 .send()
                 .thenApply(r -> null);
@@ -40,7 +41,7 @@ public class PostgresBrushContainer extends MySqlBrushContainer {
         return builder(Brush.class).query("SELECT brush FROM brushes WHERE uuid = ? AND name ILIKE ?")
                 .parameter(stmt -> stmt.setUuidAsBytes(owner())
                         .setString(name))
-                .readRow(resultSet -> yamlToObject(resultSet.getString("brush"), Brush.class))
+                .readRow(resultSet -> parseToObject(resultSet.getString("brush"), Brush.class))
                 .first();
     }
 

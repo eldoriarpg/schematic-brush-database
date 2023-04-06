@@ -6,6 +6,7 @@
 
 package de.eldoria.sbrdatabase.dao.mysql;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BasePresets;
 import de.eldoria.schematicbrush.storage.preset.PresetContainer;
@@ -17,8 +18,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class MySqlPresets extends BasePresets {
-    public MySqlPresets(DataSource dataSource, Configuration configuration) {
+    private final ObjectMapper mapper;
+
+    public MySqlPresets(DataSource dataSource, Configuration configuration, ObjectMapper mapper) {
         super(dataSource, configuration);
+        this.mapper = mapper;
     }
 
     @Override
@@ -45,6 +49,6 @@ public class MySqlPresets extends BasePresets {
 
     @Override
     public PresetContainer getContainer(UUID uuid) {
-        return new MySqlPresetContainer(uuid, configuration(), this);
+        return new MySqlPresetContainer(uuid, configuration(), this, mapper);
     }
 }

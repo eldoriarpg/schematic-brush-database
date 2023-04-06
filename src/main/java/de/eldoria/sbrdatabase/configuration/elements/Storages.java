@@ -6,6 +6,8 @@
 
 package de.eldoria.sbrdatabase.configuration.elements;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
 import de.eldoria.sbrdatabase.configuration.elements.storages.BaseDbConfig;
 import de.eldoria.sbrdatabase.configuration.elements.storages.PostgresDbConfig;
@@ -25,6 +27,17 @@ public class Storages implements ConfigurationSerializable {
     private BaseDbConfig mysql = new BaseDbConfig();
     private BaseDbConfig mariadb = new BaseDbConfig();
     private PostgresDbConfig postgres = new PostgresDbConfig();
+
+    @JsonCreator
+    public Storages(@JsonProperty("activeTypes") List<String> activeTypes,
+                    @JsonProperty("mysql") BaseDbConfig mysql,
+                    @JsonProperty("mariadb") BaseDbConfig mariadb,
+                    @JsonProperty("postgres") PostgresDbConfig postgres) {
+        this.activeTypes = activeTypes;
+        this.mysql = mysql;
+        this.mariadb = mariadb;
+        this.postgres = postgres;
+    }
 
     public Storages() {
     }

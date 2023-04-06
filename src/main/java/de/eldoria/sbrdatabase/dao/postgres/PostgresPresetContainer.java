@@ -6,6 +6,7 @@
 
 package de.eldoria.sbrdatabase.dao.postgres;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.chojo.sadu.base.QueryFactory;
 import de.chojo.sadu.wrapper.util.UpdateResult;
 import de.eldoria.sbrdatabase.configuration.Configuration;
@@ -19,8 +20,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class PostgresPresetContainer extends MySqlPresetContainer {
 
-    public PostgresPresetContainer(@Nullable UUID uuid, Configuration configuration, QueryFactory factoryHolder) {
-        super(uuid, configuration, factoryHolder);
+    public PostgresPresetContainer(@Nullable UUID uuid, Configuration configuration, QueryFactory factoryHolder, ObjectMapper mapper) {
+        super(uuid, configuration, factoryHolder, mapper);
     }
 
     @Override
@@ -29,7 +30,7 @@ public class PostgresPresetContainer extends MySqlPresetContainer {
                 .parameter(stmt ->
                         stmt.setUuidAsBytes(owner())
                                 .setString(preset.name())
-                                .setString(presetToYaml(preset))).insert().execute().thenApply(r -> null);
+                                .setString(parseToString(preset))).insert().execute().thenApply(r -> null);
     }
 
     @Override
@@ -37,7 +38,7 @@ public class PostgresPresetContainer extends MySqlPresetContainer {
         return builder(Preset.class).query("SELECT preset FROM presets WHERE uuid = ? AND name LIKE ?")
                 .parameter(stmt -> stmt.setUuidAsBytes(owner())
                         .setString(name))
-                .readRow(resultSet -> yamlToObject(resultSet.getString("preset"), Preset.class))
+                .readRow(resultSet -> parseToObject(resultSet.getString("preset"), Preset.class))
                 .first();
     }
 

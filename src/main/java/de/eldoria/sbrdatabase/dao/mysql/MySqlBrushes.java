@@ -6,6 +6,7 @@
 
 package de.eldoria.sbrdatabase.dao.mysql;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BaseBrushes;
 import de.eldoria.schematicbrush.storage.brush.BrushContainer;
@@ -17,8 +18,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class MySqlBrushes extends BaseBrushes {
-    public MySqlBrushes(DataSource dataSource, Configuration configuration) {
+    private final ObjectMapper mapper;
+
+    public MySqlBrushes(DataSource dataSource, Configuration configuration, ObjectMapper mapper) {
         super(dataSource, configuration);
+        this.mapper = mapper;
     }
 
     @Override
@@ -45,6 +49,6 @@ public class MySqlBrushes extends BaseBrushes {
 
     @Override
     public BrushContainer getContainer(UUID uuid) {
-        return new MySqlBrushContainer(uuid, configuration(), this);
+        return new MySqlBrushContainer(uuid, configuration(), this, mapper);
     }
 }

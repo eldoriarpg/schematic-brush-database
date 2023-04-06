@@ -6,6 +6,7 @@
 
 package de.eldoria.sbrdatabase.dao.mysql;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.chojo.sadu.base.QueryFactory;
 import de.chojo.sadu.wrapper.util.UpdateResult;
 import de.eldoria.sbrdatabase.configuration.Configuration;
@@ -22,8 +23,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class MySqlBrushContainer extends BaseContainer<Brush> implements BrushContainer {
 
-    public MySqlBrushContainer(@Nullable UUID uuid, Configuration configuration, QueryFactory factoryHolder) {
-        super(uuid, configuration, factoryHolder);
+    public MySqlBrushContainer(@Nullable UUID uuid, Configuration configuration, QueryFactory factoryHolder, ObjectMapper mapper) {
+        super(uuid, configuration, factoryHolder, mapper);
     }
 
     @Override
@@ -31,7 +32,7 @@ public class MySqlBrushContainer extends BaseContainer<Brush> implements BrushCo
         return builder(Brush.class).query("SELECT brush FROM brushes WHERE uuid = ? AND name LIKE ?")
                 .parameter(stmt -> stmt.setUuidAsBytes(owner())
                         .setString(name))
-                .readRow(rs -> yamlToObject(rs.getString("brush"), Brush.class))
+                .readRow(rs -> parseToObject(rs.getString("brush"), Brush.class))
                 .first();
     }
 
@@ -40,7 +41,7 @@ public class MySqlBrushContainer extends BaseContainer<Brush> implements BrushCo
                 .parameter(stmt -> stmt.setUuidAsBytes(owner())
                         .setInt(size)
                         .setInt(size * page))
-                .readRow(rs -> yamlToObject(rs.getString("brush"), Brush.class))
+                .readRow(rs -> parseToObject(rs.getString("brush"), Brush.class))
                 .all();
     }
 
@@ -49,8 +50,8 @@ public class MySqlBrushContainer extends BaseContainer<Brush> implements BrushCo
         return builder().query("INSERT INTO brushes(uuid, name, brush) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE brush = ?")
                 .parameter(stmt -> stmt.setUuidAsBytes(owner())
                         .setString(preset.name())
-                        .setString(presetToYaml(preset))
-                        .setString(presetToYaml(preset)))
+                        .setString(parseToString(preset))
+                        .setString(parseToString(preset)))
                 .insert()
                 .send()
                 .thenApply(r -> null);
@@ -61,7 +62,7 @@ public class MySqlBrushContainer extends BaseContainer<Brush> implements BrushCo
     public CompletableFuture<Collection<Brush>> all() {
         return builder(Brush.class).query("SELECT uuid, name, brush FROM brushes WHERE uuid = ?")
                 .parameter(stmt -> stmt.setUuidAsBytes(owner()))
-                .readRow(resultSet -> yamlToObject(resultSet.getString("preset"), Brush.class))
+                .readRow(resultSet -> parseToObject(resultSet.getString("preset"), Brush.class))
                 .all()
                 .thenApply(list -> list);
     }

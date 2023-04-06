@@ -6,6 +6,7 @@
 
 package de.eldoria.sbrdatabase.dao.postgres;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.mariadb.MariaDbPresets;
 import de.eldoria.schematicbrush.storage.preset.PresetContainer;
@@ -15,12 +16,15 @@ import javax.sql.DataSource;
 import java.util.UUID;
 
 public class PostgresPresets extends MariaDbPresets implements Presets {
-    public PostgresPresets(DataSource dataSource, Configuration configuration) {
-        super(dataSource, configuration);
+    private final ObjectMapper mapper;
+
+    public PostgresPresets(DataSource dataSource, Configuration configuration, ObjectMapper mapper) {
+        super(dataSource, configuration, mapper);
+        this.mapper = mapper;
     }
 
     @Override
     public PresetContainer getContainer(UUID uuid) {
-        return new PostgresPresetContainer(uuid, configuration(), this);
+        return new PostgresPresetContainer(uuid, configuration(), this, mapper);
     }
 }
