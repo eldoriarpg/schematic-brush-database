@@ -6,6 +6,8 @@
 
 package de.eldoria.sbrdatabase.configuration.elements.storages;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.jetbrains.annotations.NotNull;

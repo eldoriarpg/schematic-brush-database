@@ -18,20 +18,20 @@ repositories {
 }
 
 dependencies {
-    implementation("de.chojo.sadu", "sadu-core", "1.2.0") {
+    implementation("de.chojo.sadu", "sadu-core", "1.3.0") {
         exclude("org.jetbrains", "annotations")
         exclude("org.slf4j", "slf4j-api")
     }
-    implementation("de.chojo.sadu", "sadu-queries", "1.2.0")
-    implementation("de.chojo.sadu", "sadu-datasource", "1.2.0") {
+    implementation("de.chojo.sadu", "sadu-queries", "1.3.0")
+    implementation("de.chojo.sadu", "sadu-datasource", "1.3.0") {
         exclude("com.zaxxer")
     }
-    implementation("de.chojo.sadu", "sadu-updater", "1.2.0")
-    implementation("de.chojo.sadu", "sadu-postgresql", "1.2.0")
-    implementation("de.chojo.sadu", "sadu-mariadb", "1.2.0")
-    implementation("de.chojo.sadu", "sadu-mysql", "1.2.0")
+    implementation("de.chojo.sadu", "sadu-updater", "1.3.0")
+    implementation("de.chojo.sadu", "sadu-postgresql", "1.3.0")
+    implementation("de.chojo.sadu", "sadu-mariadb", "1.3.0")
+    implementation("de.chojo.sadu", "sadu-mysql", "1.3.0")
 
-    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.4.3")
+    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.5.0-DEV")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.14")
 
@@ -39,6 +39,12 @@ dependencies {
     bukkitLibrary("org.mariadb.jdbc", "mariadb-java-client", "3.1.3")
     bukkitLibrary("mysql", "mysql-connector-java", "8.0.32")
     bukkitLibrary("com.zaxxer", "HikariCP", "5.0.1")
+
+//    bukkitLibrary("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.2")
+//    bukkitLibrary("com.fasterxml.jackson.core:jackson-core:2.14.2")
+//    bukkitLibrary("com.fasterxml.jackson.core:jackson-databind:2.14.2")
+//    bukkitLibrary("net.kyori:adventure-platform-bukkit:4.3.0")
+//    bukkitLibrary("net.kyori:adventure-text-minimessage:4.13.0")
 
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.2")
     testImplementation("de.eldoria", "schematicbrushreborn-api", "2.4.3")
@@ -104,10 +110,9 @@ tasks {
     }
 
     shadowJar {
-        relocate("de.chojo.sqlutil", "de.eldoria.sbrdatabase.libs.sqlutil")
+        relocate("de.chojo.sadu", "de.eldoria.sbrdatabase.libs.sadu")
         relocate("de.eldoria.eldoutilities", "de.eldoria.schematicbrush.libs.eldoutilities")
         relocate("de.eldoria.messageblocker", "de.eldoria.schematicbrush.libs.messageblocker")
-        relocate("net.kyori", "de.eldoria.schematicbrush.libs.kyori")
         mergeServiceFiles()
         archiveClassifier.set("")
         archiveBaseName.set("SchematicBrushDatabase")
@@ -117,7 +122,7 @@ tasks {
         from(sourceSets.main.get().resources.srcDirs) {
             filesMatching("plugin.yml") {
                 expand(
-                    "version" to publishData.getVersion(true)
+                        "version" to publishData.getVersion(true)
                 )
             }
             duplicatesStrategy = DuplicatesStrategy.INCLUDE

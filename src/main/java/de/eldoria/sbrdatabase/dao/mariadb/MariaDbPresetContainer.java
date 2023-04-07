@@ -6,6 +6,7 @@
 
 package de.eldoria.sbrdatabase.dao.mariadb;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.chojo.sadu.base.QueryFactory;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.mysql.MySqlPresetContainer;
@@ -15,7 +16,7 @@ import java.util.UUID;
 
 public class MariaDbPresetContainer extends MySqlPresetContainer {
 
-    public MariaDbPresetContainer(@Nullable UUID uuid, Configuration configuration, QueryFactory factoryHolder) {
-        super(uuid, configuration, factoryHolder);
+    public MariaDbPresetContainer(@Nullable UUID uuid, Configuration configuration, QueryFactory factoryHolder, ObjectMapper mapper) {
+        super(uuid, configuration, factoryHolder, mapper);
     }
 }

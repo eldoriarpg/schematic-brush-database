@@ -6,6 +6,8 @@
 
 package de.eldoria.sbrdatabase.dao.base;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.chojo.sadu.base.QueryFactory;
 import de.eldoria.eldoutilities.serialization.wrapper.YamlContainer;
 import de.eldoria.eldoutilities.utils.Futures;
@@ -18,6 +20,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.sql.SQLException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
@@ -34,24 +37,32 @@ public abstract class BaseContainer<T> extends QueryFactory implements Container
     private final Configuration configuration;
     private Set<String> names = Collections.emptySet();
     private Instant lastRefresh = Instant.MIN;
+    public static boolean legacySerialization = false;
+    private final ObjectMapper mapper;
 
-    public BaseContainer(@Nullable UUID uuid, Configuration configuration, QueryFactory factoryHolder) {
+    public BaseContainer(@Nullable UUID uuid, Configuration configuration, QueryFactory factoryHolder, ObjectMapper mapper) {
         super(factoryHolder);
         this.uuid = uuid == null ? Container.GLOBAL : uuid;
         this.configuration = configuration;
+        this.mapper = mapper;
     }
 
-    protected <V extends ConfigurationSerializable> V yamlToObject(String preset, Class<V> clazz) {
+    protected <V extends ConfigurationSerializable> V parseToObject(String object, Class<V> clazz) throws SQLException {
         try {
-            return YamlContainer.yamlToObject(preset, clazz);
-        } catch (InvalidConfigurationException e) {
-            SbrDatabase.logger().log(Level.SEVERE, "Could not deserialize preset", e);
-            return null;
+            if (legacySerialization) return YamlContainer.yamlToObject(object, clazz);
+            return mapper.readValue(object, clazz);
+        } catch (InvalidConfigurationException | JsonProcessingException e) {
+            throw new SQLException("Could not deserialize object", e);
         }
     }
 
-    protected <V extends ConfigurationSerializable> String presetToYaml(V preset) {
-        return YamlContainer.objectToYaml(preset);
+    protected <V extends ConfigurationSerializable> String parseToString(V object) throws SQLException {
+        try {
+            if (legacySerialization) return YamlContainer.objectToYaml(object);
+            return mapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new SQLException("Could not serialize object", e);
+        }
     }
 
     public final Set<String> names() {

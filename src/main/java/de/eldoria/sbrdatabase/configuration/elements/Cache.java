@@ -6,6 +6,8 @@
 
 package de.eldoria.sbrdatabase.configuration.elements;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
@@ -17,7 +19,6 @@ import java.util.Map;
 public class Cache implements ConfigurationSerializable {
 
     private final int cacheRefreshSec;
-
 
     public Cache() {
         cacheRefreshSec = 30;

@@ -6,6 +6,7 @@
 
 package de.eldoria.sbrdatabase.dao.postgres;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.mariadb.MariaDbBrushes;
 import de.eldoria.schematicbrush.storage.brush.BrushContainer;
@@ -14,12 +15,15 @@ import javax.sql.DataSource;
 import java.util.UUID;
 
 public class PostgresBrushes extends MariaDbBrushes {
-    public PostgresBrushes(DataSource dataSource, Configuration configuration) {
-        super(dataSource, configuration);
+    private final ObjectMapper mapper;
+
+    public PostgresBrushes(DataSource dataSource, Configuration configuration, ObjectMapper mapper) {
+        super(dataSource, configuration, mapper);
+        this.mapper = mapper;
     }
 
     @Override
     public BrushContainer getContainer(UUID uuid) {
-        return new PostgresBrushContainer(uuid, configuration(), this);
+        return new PostgresBrushContainer(uuid, configuration(), this, mapper);
     }
 }
