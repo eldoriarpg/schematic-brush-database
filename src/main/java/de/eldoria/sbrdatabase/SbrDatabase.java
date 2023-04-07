@@ -153,9 +153,9 @@ public class SbrDatabase extends EldoPlugin {
     private Consumer<java.sql.Connection> version_1_1_migration(Nameable current) {
         return conn -> {
             BaseContainer.legacySerialization = true;
-            sbr.storageRegistry().migrate(current, StorageRegistry.YAML);
+            sbr.storageRegistry().migrate(current, StorageRegistry.YAML).join();
             BaseContainer.legacySerialization = false;
-            sbr.storageRegistry().migrate(StorageRegistry.YAML, current);
+            sbr.storageRegistry().migrate(StorageRegistry.YAML, current).join();
         };
     }
 
