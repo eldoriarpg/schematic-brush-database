@@ -6,16 +6,15 @@
 
 package de.eldoria.sbrdatabase.configuration.elements;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
+@SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 public class ConfigFile {
+    private boolean checkUpdates = true;
     private Storages storages;
     private Cache cache;
 
     public ConfigFile() {
-        this.storages = new Storages();
-        this.cache = new Cache();
+        storages = new Storages();
+        cache = new Cache();
     }
 
     public Storages storages() {
@@ -32,5 +31,9 @@ public class ConfigFile {
 
     public void cache(Cache cache) {
         this.cache = cache;
+    }
+
+    public boolean checkUpdates() {
+        return checkUpdates;
     }
 }

@@ -23,6 +23,8 @@ import de.chojo.sadu.updater.UpdaterBuilder;
 import de.chojo.sadu.wrapper.QueryBuilderConfig;
 import de.eldoria.eldoutilities.config.template.PluginBaseConfiguration;
 import de.eldoria.eldoutilities.plugin.EldoPlugin;
+import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateChecker;
+import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateData;
 import de.eldoria.sbrdatabase.configuration.JacksonConfiguration;
 import de.eldoria.sbrdatabase.configuration.LegacyConfiguration;
 import de.eldoria.sbrdatabase.configuration.elements.Cache;
@@ -82,6 +84,11 @@ public class SbrDatabase extends EldoPlugin {
             base.lastInstalledVersion(this);
             configuration.save();
         }
+
+        if (configuration.main().checkUpdates()) {
+            LynaUpdateChecker.lyna(LynaUpdateData.builder(this, 9).build()).start();
+        }
+
         registerStorageTypes();
     }
 

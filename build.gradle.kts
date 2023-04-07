@@ -40,12 +40,6 @@ dependencies {
     bukkitLibrary("mysql", "mysql-connector-java", "8.0.32")
     bukkitLibrary("com.zaxxer", "HikariCP", "5.0.1")
 
-//    bukkitLibrary("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.2")
-//    bukkitLibrary("com.fasterxml.jackson.core:jackson-core:2.14.2")
-//    bukkitLibrary("com.fasterxml.jackson.core:jackson-databind:2.14.2")
-//    bukkitLibrary("net.kyori:adventure-platform-bukkit:4.3.0")
-//    bukkitLibrary("net.kyori:adventure-text-minimessage:4.13.0")
-
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.2")
     testImplementation("de.eldoria", "schematicbrushreborn-api", "2.4.3")
     testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
