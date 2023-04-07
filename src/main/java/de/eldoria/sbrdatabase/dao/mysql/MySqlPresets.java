@@ -6,7 +6,7 @@
 
 package de.eldoria.sbrdatabase.dao.mysql;
 
-import de.chojo.sqlutil.conversion.UUIDConverter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BasePresets;
 import de.eldoria.schematicbrush.storage.preset.PresetContainer;
@@ -18,26 +18,29 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class MySqlPresets extends BasePresets {
-    public MySqlPresets(DataSource dataSource, Configuration configuration) {
+    private final ObjectMapper mapper;
+
+    public MySqlPresets(DataSource dataSource, Configuration configuration, ObjectMapper mapper) {
         super(dataSource, configuration);
+        this.mapper = mapper;
     }
 
     @Override
     public CompletableFuture<Map<UUID, ? extends PresetContainer>> playerContainers() {
         return builder(UUID.class).query("""
-                        SELECT uuid
+                        SELECT DISTINCT uuid
                         FROM presets
                         WHERE uuid IS NOT NULL
                         """)
                 .emptyParams()
-                .readRow(resultSet -> UUIDConverter.convert(resultSet.getBytes("uuid")))
+                .readRow(resultSet -> resultSet.getUuidFromBytes("uuid"))
                 .all()
                 .thenApply(uuids -> uuids.stream().collect(Collectors.toMap(uuid -> uuid, this::playerContainer)));
     }
 
     @Override
     public CompletableFuture<Integer> count() {
-        return builder(Integer.class).query("SELECT COUNT(1) FROM presets;")
+        return builder(Integer.class).query("SELECT count(1) FROM presets;")
                 .emptyParams()
                 .readRow(rs -> rs.getInt("count"))
                 .first()
@@ -46,6 +49,6 @@ public class MySqlPresets extends BasePresets {
 
     @Override
     public PresetContainer getContainer(UUID uuid) {
-        return new MySqlPresetContainer(uuid, configuration(), this);
+        return new MySqlPresetContainer(uuid, configuration(), this, mapper);
     }
 }

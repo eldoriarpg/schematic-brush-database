@@ -6,7 +6,8 @@
 
 package de.eldoria.sbrdatabase.dao.mariadb;
 
-import de.chojo.sqlutil.base.QueryFactoryHolder;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.chojo.sadu.base.QueryFactory;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.mysql.MySqlBrushContainer;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +16,7 @@ import java.util.UUID;
 
 public class MariaDbBrushContainer extends MySqlBrushContainer {
 
-    public MariaDbBrushContainer(@Nullable UUID uuid, Configuration configuration, QueryFactoryHolder factoryHolder) {
-        super(uuid, configuration, factoryHolder);
+    public MariaDbBrushContainer(@Nullable UUID uuid, Configuration configuration, QueryFactory factoryHolder, ObjectMapper mapper) {
+        super(uuid, configuration, factoryHolder, mapper);
     }
 }

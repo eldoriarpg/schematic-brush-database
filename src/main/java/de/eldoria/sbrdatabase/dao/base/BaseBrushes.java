@@ -8,7 +8,7 @@ package de.eldoria.sbrdatabase.dao.base;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import de.chojo.sqlutil.base.QueryFactoryHolder;
+import de.chojo.sadu.base.QueryFactory;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.schematicbrush.storage.brush.BrushContainer;
 import de.eldoria.schematicbrush.storage.brush.Brushes;
@@ -18,7 +18,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public abstract class BaseBrushes extends QueryFactoryHolder implements Brushes {
+public abstract class BaseBrushes extends QueryFactory implements Brushes {
     private final Cache<UUID, BrushContainer> cache = CacheBuilder.newBuilder()
             .expireAfterAccess(5, TimeUnit.MINUTES)
             .maximumSize(50)

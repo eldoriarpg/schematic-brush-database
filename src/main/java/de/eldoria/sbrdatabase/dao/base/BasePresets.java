@@ -8,7 +8,7 @@ package de.eldoria.sbrdatabase.dao.base;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import de.chojo.sqlutil.base.QueryFactoryHolder;
+import de.chojo.sadu.base.QueryFactory;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.schematicbrush.storage.preset.PresetContainer;
 import de.eldoria.schematicbrush.storage.preset.Presets;
@@ -18,7 +18,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public abstract class BasePresets extends QueryFactoryHolder implements Presets {
+public abstract class BasePresets extends QueryFactory implements Presets {
     private final Cache<UUID, PresetContainer> cache = CacheBuilder.newBuilder()
             .expireAfterAccess(5, TimeUnit.MINUTES)
             .maximumSize(50)

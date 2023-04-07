@@ -6,7 +6,8 @@
 
 package de.eldoria.sbrdatabase.configuration.elements;
 
-import de.chojo.sqlutil.databases.SqlType;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
 import de.eldoria.sbrdatabase.configuration.elements.storages.BaseDbConfig;
 import de.eldoria.sbrdatabase.configuration.elements.storages.PostgresDbConfig;
