@@ -28,7 +28,7 @@ dependencies {
     }
     implementation("de.chojo.sadu", "sadu-updater", "1.2.0")
     implementation("de.chojo.sadu", "sadu-postgresql", "1.2.0")
-    implementation("de.chojo.sadu", "sadu-mariadb", "1.2.0")
+    implementation("de.chojo.sadu", "sadu-mariadb", "1.3.0")
     implementation("de.chojo.sadu", "sadu-mysql", "1.2.0")
 
     compileOnly("de.eldoria", "schematicbrushreborn-api", "2.4.3")
