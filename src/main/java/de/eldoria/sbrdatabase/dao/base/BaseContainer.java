@@ -20,6 +20,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.sql.SQLException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
@@ -46,22 +47,21 @@ public abstract class BaseContainer<T> extends QueryFactory implements Container
         this.mapper = mapper;
     }
 
-    protected <V extends ConfigurationSerializable> V parseToObject(String object, Class<V> clazz) {
+    protected <V extends ConfigurationSerializable> V parseToObject(String object, Class<V> clazz) throws SQLException {
         try {
             if (legacySerialization) return YamlContainer.yamlToObject(object, clazz);
             return mapper.readValue(object, clazz);
         } catch (InvalidConfigurationException | JsonProcessingException e) {
-            SbrDatabase.logger().log(Level.SEVERE, "Could not deserialize preset", e);
-            return null;
+            throw new SQLException("Could not deserialize object", e);
         }
     }
 
-    protected <V extends ConfigurationSerializable> String parseToString(V object) {
+    protected <V extends ConfigurationSerializable> String parseToString(V object) throws SQLException {
         try {
             if (legacySerialization) return YamlContainer.objectToYaml(object);
             return mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            return null;
+            throw new SQLException("Could not serialize object", e);
         }
     }
 
