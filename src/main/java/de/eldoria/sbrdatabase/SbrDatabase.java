@@ -23,7 +23,6 @@ import de.chojo.sadu.updater.UpdaterBuilder;
 import de.chojo.sadu.wrapper.QueryBuilderConfig;
 import de.eldoria.eldoutilities.config.template.PluginBaseConfiguration;
 import de.eldoria.eldoutilities.plugin.EldoPlugin;
-import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.configuration.JacksonConfiguration;
 import de.eldoria.sbrdatabase.configuration.LegacyConfiguration;
 import de.eldoria.sbrdatabase.configuration.elements.Cache;
@@ -99,6 +98,7 @@ public class SbrDatabase extends EldoPlugin {
 
     private void registerStorageTypes() throws IOException, SQLException {
         var storages = configuration.storages();
+        boolean active = false;
         for (var sqlType : sqlTypes) {
             if (!storages.isActive(sqlType)) continue;
             getLogger().info("Setting up storage for " + sqlType);
@@ -107,6 +107,10 @@ public class SbrDatabase extends EldoPlugin {
                 case "postgres" -> setupPostgres();
                 case "mysql" -> setupMySql();
             }
+            active = true;
+        }
+        if (!active) {
+            getLogger().warning("No storage type active. Please enable a storage type.");
         }
     }
 
@@ -140,6 +144,7 @@ public class SbrDatabase extends EldoPlugin {
         SqlUpdater.builder(dataSource, PostgreSql.get())
                 .setReplacements(new QueryReplacement("sbr_database", postgres.schema()))
                 .setSchemas(postgres.schema())
+                .setVersionTable("sbr_version")
                 .postUpdateHook(new SqlVersion(1, 1), version_1_1_migration(SbrDatabase.postgres))
                 .execute();
         dataSource.close();

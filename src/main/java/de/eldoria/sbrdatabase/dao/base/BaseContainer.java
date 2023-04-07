@@ -48,7 +48,8 @@ public abstract class BaseContainer<T> extends QueryFactory implements Container
 
     protected <V extends ConfigurationSerializable> V parseToObject(String object, Class<V> clazz) {
         try {
-            return legacySerialization ? YamlContainer.yamlToObject(object, clazz) : mapper.readValue(object, clazz);
+            if (legacySerialization) return YamlContainer.yamlToObject(object, clazz);
+            return mapper.readValue(object, clazz);
         } catch (InvalidConfigurationException | JsonProcessingException e) {
             SbrDatabase.logger().log(Level.SEVERE, "Could not deserialize preset", e);
             return null;
@@ -57,7 +58,8 @@ public abstract class BaseContainer<T> extends QueryFactory implements Container
 
     protected <V extends ConfigurationSerializable> String parseToString(V object) {
         try {
-            return legacySerialization ? YamlContainer.objectToYaml(object) : mapper.writeValueAsString(object);
+            if (legacySerialization) return YamlContainer.objectToYaml(object);
+            return mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             return null;
         }
