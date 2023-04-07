@@ -28,17 +28,6 @@ public class Storages implements ConfigurationSerializable {
     private BaseDbConfig mariadb = new BaseDbConfig();
     private PostgresDbConfig postgres = new PostgresDbConfig();
 
-    @JsonCreator
-    public Storages(@JsonProperty("activeTypes") List<String> activeTypes,
-                    @JsonProperty("mysql") BaseDbConfig mysql,
-                    @JsonProperty("mariadb") BaseDbConfig mariadb,
-                    @JsonProperty("postgres") PostgresDbConfig postgres) {
-        this.activeTypes = activeTypes;
-        this.mysql = mysql;
-        this.mariadb = mariadb;
-        this.postgres = postgres;
-    }
-
     public Storages() {
     }
 

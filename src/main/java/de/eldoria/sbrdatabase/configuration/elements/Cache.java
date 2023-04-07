@@ -20,12 +20,6 @@ public class Cache implements ConfigurationSerializable {
 
     private final int cacheRefreshSec;
 
-
-    @JsonCreator
-    public Cache(@JsonProperty("cacheRefreshSec") int cacheRefreshSec) {
-        this.cacheRefreshSec = cacheRefreshSec;
-    }
-
     public Cache() {
         cacheRefreshSec = 30;
     }

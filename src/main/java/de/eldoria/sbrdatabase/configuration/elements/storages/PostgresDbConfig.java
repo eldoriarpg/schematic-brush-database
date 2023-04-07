@@ -23,18 +23,6 @@ public class PostgresDbConfig extends BaseDbConfig {
         port = "5432";
     }
 
-    @JsonCreator
-    public PostgresDbConfig(@JsonProperty("host") String host,
-                            @JsonProperty("port") String port,
-                            @JsonProperty("database") String database,
-                            @JsonProperty("user") String user,
-                            @JsonProperty("password") String password,
-                            @JsonProperty("connections") int connections,
-                            @JsonProperty("schema") String schema) {
-        super(host, port, database, user, password, connections);
-        this.schema = schema;
-    }
-
     public PostgresDbConfig(Map<String, Object> objectMap) {
         super(objectMap);
         schema = SerializationUtil.mapOf(objectMap).getValue("schema");

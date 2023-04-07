@@ -24,21 +24,6 @@ public class BaseDbConfig implements ConfigurationSerializable {
     protected String password;
     protected int connections;
 
-    @JsonCreator
-    public BaseDbConfig(@JsonProperty("host") String host,
-                        @JsonProperty("port") String port,
-                        @JsonProperty("database") String database,
-                        @JsonProperty("user") String user,
-                        @JsonProperty("password") String password,
-                        @JsonProperty("connections") int connections) {
-        this.host = host;
-        this.port = port;
-        this.database = database;
-        this.user = user;
-        this.password = password;
-        this.connections = connections;
-    }
-
     public BaseDbConfig() {
         connections = 3;
         password = "passy";

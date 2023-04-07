@@ -13,13 +13,6 @@ public class ConfigFile {
     private Storages storages;
     private Cache cache;
 
-    @JsonCreator
-    public ConfigFile(@JsonProperty("storages") Storages storages,
-                      @JsonProperty("cache") Cache cache) {
-        this.storages = storages;
-        this.cache = cache;
-    }
-
     public ConfigFile() {
         this.storages = new Storages();
         this.cache = new Cache();
