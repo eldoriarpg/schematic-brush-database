@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    implementation("de.chojo.sadu", "sadu-core", "1.2.0") {
+    implementation("de.chojo.sadu", "sadu-core", "1.3.0") {
         exclude("org.jetbrains", "annotations")
         exclude("org.slf4j", "slf4j-api")
     }
