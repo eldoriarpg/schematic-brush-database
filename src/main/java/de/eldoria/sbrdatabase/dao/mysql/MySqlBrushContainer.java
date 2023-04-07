@@ -62,7 +62,7 @@ public class MySqlBrushContainer extends BaseContainer<Brush> implements BrushCo
     public CompletableFuture<Collection<Brush>> all() {
         return builder(Brush.class).query("SELECT uuid, name, brush FROM brushes WHERE uuid = ?")
                 .parameter(stmt -> stmt.setUuidAsBytes(owner()))
-                .readRow(resultSet -> parseToObject(resultSet.getString("preset"), Brush.class))
+                .readRow(resultSet -> parseToObject(resultSet.getString("brush"), Brush.class))
                 .all()
                 .thenApply(list -> list);
     }

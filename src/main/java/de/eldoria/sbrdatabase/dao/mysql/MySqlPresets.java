@@ -28,7 +28,7 @@ public class MySqlPresets extends BasePresets {
     @Override
     public CompletableFuture<Map<UUID, ? extends PresetContainer>> playerContainers() {
         return builder(UUID.class).query("""
-                        SELECT uuid
+                        SELECT DISTINCT uuid
                         FROM presets
                         WHERE uuid IS NOT NULL
                         """)

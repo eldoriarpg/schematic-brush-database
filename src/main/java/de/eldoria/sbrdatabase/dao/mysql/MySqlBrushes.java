@@ -28,7 +28,7 @@ public class MySqlBrushes extends BaseBrushes {
     @Override
     public CompletableFuture<Map<UUID, ? extends BrushContainer>> playerContainers() {
         return builder(UUID.class).query("""
-                        SELECT uuid
+                        SELECT DISTINCT uuid
                         FROM brushes
                         WHERE uuid IS NOT NULL
                         """)
