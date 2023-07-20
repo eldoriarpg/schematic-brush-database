@@ -23,7 +23,7 @@ dependencies {
         exclude("org.slf4j", "slf4j-api")
     }
     implementation("de.chojo.sadu", "sadu-queries", "1.3.0")
-    implementation("de.chojo.sadu", "sadu-datasource", "1.3.0") {
+    implementation("de.chojo.sadu", "sadu-datasource", "1.3.1") {
         exclude("com.zaxxer")
     }
     implementation("de.chojo.sadu", "sadu-updater", "1.3.0")
