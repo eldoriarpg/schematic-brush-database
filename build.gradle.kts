@@ -24,7 +24,7 @@ dependencies {
     bukkitLibrary("de.chojo.sadu", "sadu-updater", "1.3.1")
     bukkitLibrary("de.chojo.sadu", "sadu-postgresql", "1.3.1")
     bukkitLibrary("de.chojo.sadu", "sadu-mariadb", "1.3.1")
-    bukkitLibrary("de.chojo.sadu", "sadu-mysql", "1.3.0")
+    bukkitLibrary("de.chojo.sadu", "sadu-mysql", "1.3.1")
 
     compileOnly("de.eldoria", "schematicbrushreborn-api", "2.5.0")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
