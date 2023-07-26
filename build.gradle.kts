@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    bukkitLibrary("de.chojo.sadu", "sadu-core", "1.3.0")
+    bukkitLibrary("de.chojo.sadu", "sadu-core", "1.3.1")
     bukkitLibrary("de.chojo.sadu", "sadu-queries", "1.3.1")
     bukkitLibrary("de.chojo.sadu", "sadu-datasource", "1.3.1")
     bukkitLibrary("de.chojo.sadu", "sadu-updater", "1.3.1")
