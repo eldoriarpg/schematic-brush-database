@@ -18,18 +18,13 @@ repositories {
 }
 
 dependencies {
-    implementation("de.chojo.sadu", "sadu-core", "1.3.0") {
-        exclude("org.jetbrains", "annotations")
-        exclude("org.slf4j", "slf4j-api")
-    }
-    implementation("de.chojo.sadu", "sadu-queries", "1.3.0")
-    implementation("de.chojo.sadu", "sadu-datasource", "1.3.0") {
-        exclude("com.zaxxer")
-    }
-    implementation("de.chojo.sadu", "sadu-updater", "1.3.0")
-    implementation("de.chojo.sadu", "sadu-postgresql", "1.3.0")
-    implementation("de.chojo.sadu", "sadu-mariadb", "1.3.0")
-    implementation("de.chojo.sadu", "sadu-mysql", "1.3.0")
+    bukkitLibrary("de.chojo.sadu", "sadu-core", "1.3.0")
+    bukkitLibrary("de.chojo.sadu", "sadu-queries", "1.3.1")
+    bukkitLibrary("de.chojo.sadu", "sadu-datasource", "1.3.1")
+    bukkitLibrary("de.chojo.sadu", "sadu-updater", "1.3.1")
+    bukkitLibrary("de.chojo.sadu", "sadu-postgresql", "1.3.1")
+    bukkitLibrary("de.chojo.sadu", "sadu-mariadb", "1.3.1")
+    bukkitLibrary("de.chojo.sadu", "sadu-mysql", "1.3.0")
 
     compileOnly("de.eldoria", "schematicbrushreborn-api", "2.5.0")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
@@ -104,7 +99,6 @@ tasks {
     }
 
     shadowJar {
-        relocate("de.chojo.sadu", "de.eldoria.sbrdatabase.libs.sadu")
         relocate("de.eldoria.eldoutilities", "de.eldoria.schematicbrush.libs.eldoutilities")
         relocate("de.eldoria.messageblocker", "de.eldoria.schematicbrush.libs.messageblocker")
         mergeServiceFiles()
