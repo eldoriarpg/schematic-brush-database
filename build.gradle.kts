@@ -33,7 +33,7 @@ dependencies {
     bukkitLibrary("org.postgresql", "postgresql", "42.6.0")
     bukkitLibrary("org.mariadb.jdbc", "mariadb-java-client", "3.3.0")
     bukkitLibrary("mysql", "mysql-connector-java", "8.0.33")
-    bukkitLibrary("com.zaxxer", "HikariCP", "5.0.1")
+    bukkitLibrary("com.zaxxer", "HikariCP", "5.1.0")
 
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.10.1")
     testImplementation("de.eldoria", "schematicbrushreborn-api", "2.5.4")
