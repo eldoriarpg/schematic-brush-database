@@ -23,7 +23,7 @@ dependencies {
     bukkitLibrary("de.chojo.sadu", "sadu-datasource", "1.3.1")
     bukkitLibrary("de.chojo.sadu", "sadu-updater", "1.3.1")
     bukkitLibrary("de.chojo.sadu", "sadu-postgresql", "1.3.1")
-    bukkitLibrary("de.chojo.sadu", "sadu-mariadb", "1.3.1")
+    bukkitLibrary("de.chojo.sadu", "sadu-mariadb", "1.4.0")
     bukkitLibrary("de.chojo.sadu", "sadu-mysql", "1.3.1")
 
     compileOnly("de.eldoria", "schematicbrushreborn-api", "2.5.5")
