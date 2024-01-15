@@ -1,14 +1,14 @@
 plugins {
     id("org.cadixdev.licenser") version "0.6.1"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("de.chojo.publishdata") version "1.2.4"
-    id("net.minecrell.plugin-yml.bukkit") version "0.5.3"
+    id("de.chojo.publishdata") version "1.2.5"
+    id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
     java
     `maven-publish`
 }
 
 group = "de.eldoria"
-version = "1.1.0"
+version = "1.1.1"
 val shadebase = "de.eldoria." + rootProject.name + ".libs."
 
 repositories {
@@ -18,30 +18,25 @@ repositories {
 }
 
 dependencies {
-    implementation("de.chojo.sadu", "sadu-core", "1.3.0") {
-        exclude("org.jetbrains", "annotations")
-        exclude("org.slf4j", "slf4j-api")
-    }
-    implementation("de.chojo.sadu", "sadu-queries", "1.3.0")
-    implementation("de.chojo.sadu", "sadu-datasource", "1.3.0") {
-        exclude("com.zaxxer")
-    }
-    implementation("de.chojo.sadu", "sadu-updater", "1.3.0")
-    implementation("de.chojo.sadu", "sadu-postgresql", "1.3.0")
-    implementation("de.chojo.sadu", "sadu-mariadb", "1.3.0")
-    implementation("de.chojo.sadu", "sadu-mysql", "1.3.0")
+    bukkitLibrary("de.chojo.sadu", "sadu-core", "1.4.0")
+    bukkitLibrary("de.chojo.sadu", "sadu-queries", "1.4.0")
+    bukkitLibrary("de.chojo.sadu", "sadu-datasource", "1.4.0")
+    bukkitLibrary("de.chojo.sadu", "sadu-updater", "1.4.0")
+    bukkitLibrary("de.chojo.sadu", "sadu-postgresql", "1.4.0")
+    bukkitLibrary("de.chojo.sadu", "sadu-mariadb", "1.4.0")
+    bukkitLibrary("de.chojo.sadu", "sadu-mysql", "1.4.0")
 
-    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.5.0")
+    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.5.6")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
-    compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.14")
+    compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.18")
 
-    bukkitLibrary("org.postgresql", "postgresql", "42.6.0")
-    bukkitLibrary("org.mariadb.jdbc", "mariadb-java-client", "3.1.3")
-    bukkitLibrary("mysql", "mysql-connector-java", "8.0.32")
-    bukkitLibrary("com.zaxxer", "HikariCP", "5.0.1")
+    bukkitLibrary("org.postgresql", "postgresql", "42.7.1")
+    bukkitLibrary("org.mariadb.jdbc", "mariadb-java-client", "3.3.2")
+    bukkitLibrary("mysql", "mysql-connector-java", "8.0.33")
+    bukkitLibrary("com.zaxxer", "HikariCP", "5.1.0")
 
-    testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.2")
-    testImplementation("de.eldoria", "schematicbrushreborn-api", "2.4.3")
+    testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.10.1")
+    testImplementation("de.eldoria", "schematicbrushreborn-api", "2.5.6")
     testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     testImplementation("com.fasterxml.jackson.core", "jackson-databind", "2.14.2")
 
@@ -104,7 +99,6 @@ tasks {
     }
 
     shadowJar {
-        relocate("de.chojo.sadu", "de.eldoria.sbrdatabase.libs.sadu")
         relocate("de.eldoria.eldoutilities", "de.eldoria.schematicbrush.libs.eldoutilities")
         relocate("de.eldoria.messageblocker", "de.eldoria.schematicbrush.libs.messageblocker")
         mergeServiceFiles()
