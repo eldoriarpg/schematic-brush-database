@@ -26,7 +26,7 @@ dependencies {
     bukkitLibrary("de.chojo.sadu", "sadu-mariadb", "1.4.0")
     bukkitLibrary("de.chojo.sadu", "sadu-mysql", "1.4.0")
 
-    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.5.5")
+    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.5.6")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.18")
 
@@ -36,7 +36,7 @@ dependencies {
     bukkitLibrary("com.zaxxer", "HikariCP", "5.1.0")
 
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.10.1")
-    testImplementation("de.eldoria", "schematicbrushreborn-api", "2.5.5")
+    testImplementation("de.eldoria", "schematicbrushreborn-api", "2.5.6")
     testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     testImplementation("com.fasterxml.jackson.core", "jackson-databind", "2.14.2")
 
