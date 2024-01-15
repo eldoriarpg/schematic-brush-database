@@ -30,7 +30,7 @@ dependencies {
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.17")
 
-    bukkitLibrary("org.postgresql", "postgresql", "42.6.0")
+    bukkitLibrary("org.postgresql", "postgresql", "42.7.1")
     bukkitLibrary("org.mariadb.jdbc", "mariadb-java-client", "3.3.2")
     bukkitLibrary("mysql", "mysql-connector-java", "8.0.33")
     bukkitLibrary("com.zaxxer", "HikariCP", "5.1.0")
