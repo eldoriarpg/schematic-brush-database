@@ -125,6 +125,7 @@ public class SbrDatabase extends EldoPlugin {
         var dataSource = applyBaseDb(MariaDb.get(), configuration.storages().mariadb()).build();
         sbr.storageRegistry().register(SbrDatabase.mariadb, new MariaDbStorage(dataSource, configuration, mapper));
         SqlUpdater.builder(dataSource, MariaDb.get())
+                .withClassLoader(getClassLoader())
                 .setVersionTable("sbr_version")
                 .postUpdateHook(new SqlVersion(1, 1), version_1_1_migration(SbrDatabase.mariadb))
                 .execute();
@@ -134,6 +135,7 @@ public class SbrDatabase extends EldoPlugin {
         dataSource = applyBaseDb(MySql.get(), configuration.storages().mysql()).build();
         sbr.storageRegistry().register(SbrDatabase.mysql, new MySqlStorage(dataSource, configuration, mapper));
         SqlUpdater.builder(dataSource, MySql.get())
+                .withClassLoader(getClassLoader())
                 .setVersionTable("sbr_version")
                 .postUpdateHook(new SqlVersion(1, 1), version_1_1_migration(SbrDatabase.mysql))
                 .execute();
@@ -149,6 +151,7 @@ public class SbrDatabase extends EldoPlugin {
 
         var dataSource = applyBaseDb(PostgreSql.get(), postgres).build();
         SqlUpdater.builder(dataSource, PostgreSql.get())
+                .withClassLoader(getClassLoader())
                 .setReplacements(new QueryReplacement("sbr_database", postgres.schema()))
                 .setSchemas(postgres.schema())
                 .setVersionTable("sbr_version")
