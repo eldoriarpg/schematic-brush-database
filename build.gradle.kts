@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.bundles.sadu)
+    bukkitLibrary(libs.bundles.sadu)
 
     compileOnly("de.eldoria", "schematicbrushreborn-api", "2.5.6")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
