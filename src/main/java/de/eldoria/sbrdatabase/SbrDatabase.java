@@ -91,6 +91,7 @@ public class SbrDatabase extends EldoPlugin {
         }
 
         registerStorageTypes();
+        configuration.save();
     }
 
     @Override
