@@ -168,6 +168,7 @@ public class SbrDatabase extends EldoPlugin {
         sources.add(source);
     }
 
+    @SuppressWarnings("AssignmentToStaticFieldFromInstanceMethod")
     private Consumer<java.sql.Connection> version_1_1_migration(Nameable current) {
         return conn -> {
             BaseContainer.legacySerialization = true;
