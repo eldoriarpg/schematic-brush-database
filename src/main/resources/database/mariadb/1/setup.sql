@@ -1,4 +1,4 @@
-CREATE TABLE public.brushes
+CREATE TABLE brushes
 (
     uuid  BINARY(128) NOT NULL ,
     name  TEXT       NOT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE public.brushes
         UNIQUE (uuid, name(64))
 );
 
-CREATE TABLE public.presets
+CREATE TABLE presets
 (
     uuid   BINARY(128) NOT NULL ,
     name   TEXT       NOT NULL,
