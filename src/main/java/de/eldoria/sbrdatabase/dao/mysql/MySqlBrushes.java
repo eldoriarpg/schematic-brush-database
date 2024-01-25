@@ -40,7 +40,7 @@ public class MySqlBrushes extends BaseBrushes {
 
     @Override
     public CompletableFuture<Integer> count() {
-        return builder(Integer.class).query("SELECT count(1) FROM brushes;")
+        return builder(Integer.class).query("SELECT count(1) AS count FROM brushes;")
                 .emptyParams()
                 .readRow(rs -> rs.getInt("count"))
                 .first()
