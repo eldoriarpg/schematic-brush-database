@@ -42,6 +42,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,7 +56,7 @@ public class SbrDatabase extends EldoPlugin {
     public static final Nameable[] sqlTypes = {mariadb, mysql, postgres};
     private final Thread.UncaughtExceptionHandler exceptionHandler = (thread, err) -> logger().log(Level.SEVERE, "Unhandled exception occured in thread " + thread.getName() + "-" + thread.getId(), err);
     private ObjectMapper mapper;
-    private HikariDataSource dataSource;
+    private final List<HikariDataSource> sources = new ArrayList<>();
     private final ExecutorService executor = Executors.newCachedThreadPool(run -> {
         var thread = new Thread(run, "DbThreads");
         thread.setUncaughtExceptionHandler(exceptionHandler);
@@ -90,12 +91,16 @@ public class SbrDatabase extends EldoPlugin {
         }
 
         registerStorageTypes();
+        configuration.save();
     }
 
     @Override
     public void onPluginDisable() throws Throwable {
         executor.shutdown();
-        dataSource.close();
+        configuration.save();
+        for (HikariDataSource source : sources) {
+            source.close();
+        }
     }
 
     @Override
@@ -122,44 +127,48 @@ public class SbrDatabase extends EldoPlugin {
     }
 
     private void setupMariaDb() throws IOException, SQLException {
-        var dataSource = applyBaseDb(MariaDb.get(), configuration.storages().mariadb()).build();
-        sbr.storageRegistry().register(SbrDatabase.mariadb, new MariaDbStorage(dataSource, configuration, mapper));
-        SqlUpdater.builder(dataSource, MariaDb.get())
+        var source = applyBaseDb(MariaDb.get(), configuration.storages().mariadb()).build();
+        sbr.storageRegistry().register(SbrDatabase.mariadb, new MariaDbStorage(source, configuration, mapper));
+        SqlUpdater.builder(source, MariaDb.get())
                 .withClassLoader(getClassLoader())
                 .setVersionTable("sbr_version")
                 .postUpdateHook(new SqlVersion(1, 1), version_1_1_migration(SbrDatabase.mariadb))
                 .execute();
+        sources.add(source);
     }
 
     private void setupMySql() throws IOException, SQLException {
-        dataSource = applyBaseDb(MySql.get(), configuration.storages().mysql()).build();
-        sbr.storageRegistry().register(SbrDatabase.mysql, new MySqlStorage(dataSource, configuration, mapper));
-        SqlUpdater.builder(dataSource, MySql.get())
+        var source = applyBaseDb(MySql.get(), configuration.storages().mysql()).build();
+        sbr.storageRegistry().register(SbrDatabase.mysql, new MySqlStorage(source, configuration, mapper));
+        SqlUpdater.builder(source, MySql.get())
                 .withClassLoader(getClassLoader())
                 .setVersionTable("sbr_version")
                 .postUpdateHook(new SqlVersion(1, 1), version_1_1_migration(SbrDatabase.mysql))
                 .execute();
+        sources.add(source);
     }
 
     private void setupPostgres() throws IOException, SQLException {
         var postgres = configuration.storages().postgres();
-        dataSource = applyBaseDb(PostgreSql.get(), postgres)
+        var source = applyBaseDb(PostgreSql.get(), postgres)
                 .forSchema(postgres.schema())
                 .build();
 
-        sbr.storageRegistry().register(SbrDatabase.postgres, new PostgresStorage(dataSource, configuration, mapper));
 
-        var dataSource = applyBaseDb(PostgreSql.get(), postgres).build();
-        SqlUpdater.builder(dataSource, PostgreSql.get())
+        var update = applyBaseDb(PostgreSql.get(), postgres).build();
+        sbr.storageRegistry().register(SbrDatabase.postgres, new PostgresStorage(source, configuration, mapper));
+        SqlUpdater.builder(update, PostgreSql.get())
                 .withClassLoader(getClassLoader())
                 .setReplacements(new QueryReplacement("sbr_database", postgres.schema()))
                 .setSchemas(postgres.schema())
                 .setVersionTable("sbr_version")
                 .postUpdateHook(new SqlVersion(1, 1), version_1_1_migration(SbrDatabase.postgres))
                 .execute();
-        dataSource.close();
+        update.close();
+        sources.add(source);
     }
 
+    @SuppressWarnings("AssignmentToStaticFieldFromInstanceMethod")
     private Consumer<java.sql.Connection> version_1_1_migration(Nameable current) {
         return conn -> {
             BaseContainer.legacySerialization = true;
@@ -177,6 +186,7 @@ public class SbrDatabase extends EldoPlugin {
                         .user(config.user())
                         .password(config.password()))
                 .create()
+                .withPoolName("SBR Database %s".formatted(type.name()))
                 .withMinimumIdle(1)
                 .withMaximumPoolSize(config.connections());
     }

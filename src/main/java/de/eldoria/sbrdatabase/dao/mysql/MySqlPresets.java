@@ -40,7 +40,7 @@ public class MySqlPresets extends BasePresets {
 
     @Override
     public CompletableFuture<Integer> count() {
-        return builder(Integer.class).query("SELECT count(1) FROM presets;")
+        return builder(Integer.class).query("SELECT count(1) AS count FROM presets;")
                 .emptyParams()
                 .readRow(rs -> rs.getInt("count"))
                 .first()

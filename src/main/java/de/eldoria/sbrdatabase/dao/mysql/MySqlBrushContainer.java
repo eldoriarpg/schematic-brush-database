@@ -87,7 +87,7 @@ public class MySqlBrushContainer extends BaseContainer<Brush> implements BrushCo
 
     @Override
     public CompletableFuture<Integer> size() {
-        return builder(Integer.class).query("SELECT count(1) FROM brushes WHERE uuid = ?")
+        return builder(Integer.class).query("SELECT count(1) AS count FROM brushes WHERE uuid = ?")
                 .parameter(stmt -> stmt.setUuidAsBytes(owner()))
                 .readRow(rs -> rs.getInt("count"))
                 .first().thenApply(e -> e.orElse(0));

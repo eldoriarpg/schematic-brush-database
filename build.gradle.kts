@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "de.eldoria"
-version = "1.1.2"
+version = "1.1.3"
 val shadebase = "de.eldoria." + rootProject.name + ".libs."
 
 repositories {
@@ -20,7 +20,7 @@ repositories {
 dependencies {
     bukkitLibrary(libs.bundles.sadu)
 
-    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.5.6")
+    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.6.0")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.2.18")
 
@@ -30,7 +30,7 @@ dependencies {
     bukkitLibrary("com.zaxxer", "HikariCP", "5.1.0")
 
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.10.1")
-    testImplementation("de.eldoria", "schematicbrushreborn-api", "2.5.6")
+    testImplementation("de.eldoria", "schematicbrushreborn-api", "2.6.0")
     testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     testImplementation("com.fasterxml.jackson.core", "jackson-databind", "2.14.2")
 
