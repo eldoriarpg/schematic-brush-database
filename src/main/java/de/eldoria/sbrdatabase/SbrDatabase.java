@@ -186,6 +186,7 @@ public class SbrDatabase extends EldoPlugin {
                         .user(config.user())
                         .password(config.password()))
                 .create()
+                .withPoolName("SBR Database %s".formatted(type.name()))
                 .withMinimumIdle(1)
                 .withMaximumPoolSize(config.connections());
     }
