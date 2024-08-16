@@ -12,6 +12,10 @@ publishData {
     publishTask("sourcesJar")
 }
 
+dependencies{
+    implementation(project(":core"))
+}
+
 publishing {
     publications.create<MavenPublication>("maven") {
         publishData.configurePublication(this)
@@ -47,5 +51,9 @@ tasks {
     shadowJar {
         relocate("de.eldoria.messageblocker", "de.eldoria.schematicbrush.libs.messageblocker")
         mergeServiceFiles()
+    }
+
+    build {
+        dependsOn(shadowJar)
     }
 }

@@ -104,6 +104,11 @@ public class SbrDatabase extends EldoPlugin {
     }
 
     @Override
+    public Level getLogLevel() {
+        return configuration.secondary(PluginBaseConfiguration.KEY).logLevel();
+    }
+
+    @Override
     public List<Class<? extends ConfigurationSerializable>> getConfigSerialization() {
         return List.of(Storages.class, BaseDbConfig.class, PostgresDbConfig.class, Cache.class);
     }

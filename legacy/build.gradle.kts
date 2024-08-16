@@ -4,6 +4,10 @@ plugins {
     `maven-publish`
 }
 
+dependencies {
+    implementation(project(":core"))
+}
+
 publishData {
     addBuildData()
     useEldoNexusRepos()
@@ -39,4 +43,7 @@ tasks {
         mergeServiceFiles()
     }
 
+    build {
+        dependsOn(shadowJar)
+    }
 }
