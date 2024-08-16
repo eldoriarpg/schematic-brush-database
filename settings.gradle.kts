@@ -24,6 +24,14 @@ dependencyResolutionManagement{
             library("sadu-mariadb","de.chojo.sadu", "sadu-mariadb").versionRef("sadu")
             library("sadu-mysql","de.chojo.sadu", "sadu-mysql").versionRef("sadu")
             bundle("sadu", listOf("sadu-core","sadu-queries", "sadu-datasource", "sadu-updater","sadu-postgresql","sadu-mariadb","sadu-mysql"))
+
+            plugin("publishdata", "de.chojo.publishdata").version("1.4.0")
+            plugin("licenser", "org.cadixdev.licenser").version("0.6.1")
+            plugin("shadow", "io.github.goooler.shadow").version("8.1.8")
+            plugin("pluginyml", "net.minecrell.plugin-yml.bukkit").version("0.6.0")
         }
     }
 }
+include("core")
+include("legacy")
+include("latest")

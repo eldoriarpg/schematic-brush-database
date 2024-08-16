@@ -54,7 +54,7 @@ public class SbrDatabase extends EldoPlugin {
     private static final Nameable mysql = Nameable.of("mysql");
     private static final Nameable postgres = Nameable.of("postgres");
     public static final Nameable[] sqlTypes = {mariadb, mysql, postgres};
-    private final Thread.UncaughtExceptionHandler exceptionHandler = (thread, err) -> logger().log(Level.SEVERE, "Unhandled exception occured in thread " + thread.getName() + "-" + thread.getId(), err);
+    private final Thread.UncaughtExceptionHandler exceptionHandler = (thread, err) -> EldoPlugin.logger().log(Level.SEVERE, "Unhandled exception occured in thread " + thread.getName() + "-" + thread.getId(), err);
     private ObjectMapper mapper;
     private final List<HikariDataSource> sources = new ArrayList<>();
     private final ExecutorService executor = Executors.newCachedThreadPool(run -> {
@@ -71,7 +71,7 @@ public class SbrDatabase extends EldoPlugin {
         var builder = JsonMapper.builder();
         mapper = sbr.configureMapper(builder);
         QueryBuilderConfig.setDefault(QueryBuilderConfig.builder()
-                .withExceptionHandler(ex -> logger().log(Level.SEVERE, "SQL Exception occured.", ex))
+                .withExceptionHandler(ex -> EldoPlugin.logger().log(Level.SEVERE, "SQL Exception occured.", ex))
                 .build());
 
         configuration = new JacksonConfiguration(this);
