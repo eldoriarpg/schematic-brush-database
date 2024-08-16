@@ -39,7 +39,11 @@ import de.eldoria.schematicbrush.SchematicBrushReborn;
 import de.eldoria.schematicbrush.brush.config.util.Nameable;
 import de.eldoria.schematicbrush.storage.StorageRegistry;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.java.JavaPluginLoader;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -57,6 +61,15 @@ public class SbrDatabase extends EldoPlugin {
     private JacksonConfiguration configuration;
     private SchematicBrushReborn sbr;
 
+    public SbrDatabase() {
+        configuration = new JacksonConfiguration(this);
+    }
+
+    public SbrDatabase(@NotNull JavaPluginLoader loader, @NotNull PluginDescriptionFile description, @NotNull File dataFolder, @NotNull File file) {
+        super(loader, description, dataFolder, file);
+        configuration = new JacksonConfiguration(this);
+    }
+
     @Override
     public void onPluginLoad() throws Throwable {
         sbr = SchematicBrushReborn.instance();
@@ -66,7 +79,6 @@ public class SbrDatabase extends EldoPlugin {
                 .setExceptionHandler(ex -> getLogger().log(Level.SEVERE, "SQL Exception occurred.", ex))
                 .build());
 
-        configuration = new JacksonConfiguration(this);
         PluginBaseConfiguration base = configuration.secondary(PluginBaseConfiguration.KEY);
         if (base.version() == 0) {
             var legacyConfiguration = new LegacyConfiguration(this);
