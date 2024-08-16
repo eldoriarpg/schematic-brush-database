@@ -11,7 +11,7 @@ publishData {
 dependencies {
     bukkitLibrary(libs.bundles.sadu)
     bukkitLibrary("org.postgresql", "postgresql", "42.7.1")
-    bukkitLibrary("org.mariadb.jdbc", "mariadb-java-client", "3.3.2")
+    bukkitLibrary("org.mariadb.jdbc", "mariadb-java-client", "3.4.1")
     bukkitLibrary("mysql", "mysql-connector-java", "8.0.33")
     bukkitLibrary("com.zaxxer", "HikariCP", "5.1.0")
 
