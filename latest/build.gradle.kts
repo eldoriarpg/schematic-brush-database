@@ -49,7 +49,6 @@ tasks {
         rename{"schematic-brush-database.jar"}
     }
     shadowJar {
-        relocate("de.eldoria.messageblocker", "de.eldoria.schematicbrush.libs.messageblocker")
         mergeServiceFiles()
     }
 

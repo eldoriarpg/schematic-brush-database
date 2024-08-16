@@ -39,7 +39,6 @@ publishing {
 tasks {
     shadowJar {
         relocate("de.eldoria.eldoutilities", "de.eldoria.schematicbrush.libs.eldoutilities")
-        relocate("de.eldoria.messageblocker", "de.eldoria.schematicbrush.libs.messageblocker")
         mergeServiceFiles()
     }
 
