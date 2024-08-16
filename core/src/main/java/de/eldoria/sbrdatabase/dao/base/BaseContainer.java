@@ -8,7 +8,9 @@ package de.eldoria.sbrdatabase.dao.base;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.chojo.sadu.base.QueryFactory;
+import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
+import de.chojo.sadu.queries.api.query.ParsedQuery;
+import de.chojo.sadu.queries.configuration.ConnectedQueryConfigurationImpl;
 import de.eldoria.eldoutilities.serialization.wrapper.YamlContainer;
 import de.eldoria.eldoutilities.utils.Futures;
 import de.eldoria.sbrdatabase.SbrDatabase;
@@ -31,19 +33,20 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-public abstract class BaseContainer<T> extends QueryFactory implements Container<T> {
+public abstract class BaseContainer<T> implements Container<T> {
     @NotNull
     private final UUID uuid;
     private final Configuration configuration;
     private Set<String> names = Collections.emptySet();
     private Instant lastRefresh = Instant.MIN;
     public static boolean legacySerialization = false;
+    private final QueryConfiguration queryConfiguration;
     private final ObjectMapper mapper;
 
-    public BaseContainer(@Nullable UUID uuid, Configuration configuration, QueryFactory factoryHolder, ObjectMapper mapper) {
-        super(factoryHolder);
+    public BaseContainer(@Nullable UUID uuid, Configuration configuration, QueryConfiguration queryConfiguration, ObjectMapper mapper) {
         this.uuid = uuid == null ? Container.GLOBAL : uuid;
         this.configuration = configuration;
+        this.queryConfiguration = queryConfiguration;
         this.mapper = mapper;
     }
 
@@ -56,12 +59,12 @@ public abstract class BaseContainer<T> extends QueryFactory implements Container
         }
     }
 
-    protected <V extends ConfigurationSerializable> String parseToString(V object) throws SQLException {
+    protected <V extends ConfigurationSerializable> String parseToString(V object) {
         try {
             if (legacySerialization) return YamlContainer.objectToYaml(object);
             return mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            throw new SQLException("Could not serialize object", e);
+            throw new RuntimeException("Could not serialize object", e);
         }
     }
 
@@ -92,5 +95,13 @@ public abstract class BaseContainer<T> extends QueryFactory implements Container
     @Override
     public @NotNull UUID owner() {
         return uuid;
+    }
+
+    public ConnectedQueryConfigurationImpl withSingleTransaction() {
+        return queryConfiguration.withSingleTransaction();
+    }
+
+    public ParsedQuery query(String sql, Object... format) {
+        return queryConfiguration.query(sql, format);
     }
 }

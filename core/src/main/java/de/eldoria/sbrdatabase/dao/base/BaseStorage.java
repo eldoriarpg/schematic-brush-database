@@ -7,6 +7,7 @@
 package de.eldoria.sbrdatabase.dao.base;
 
 import com.zaxxer.hikari.HikariDataSource;
+import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import de.eldoria.schematicbrush.storage.Storage;
 import de.eldoria.schematicbrush.storage.brush.Brushes;
 import de.eldoria.schematicbrush.storage.preset.Presets;
@@ -14,12 +15,12 @@ import de.eldoria.schematicbrush.storage.preset.Presets;
 public class BaseStorage implements Storage {
     private final BasePresets presets;
     private final BaseBrushes brushes;
-    private final HikariDataSource dataSource;
+    private final QueryConfiguration queryConfiguration;
 
-    public BaseStorage(BasePresets presets, BaseBrushes brushes, HikariDataSource dataSource) {
+    public BaseStorage(BasePresets presets, BaseBrushes brushes, QueryConfiguration queryConfiguration) {
         this.presets = presets;
         this.brushes = brushes;
-        this.dataSource = dataSource;
+        this.queryConfiguration = queryConfiguration;
     }
 
     @Override
@@ -34,6 +35,6 @@ public class BaseStorage implements Storage {
 
     @Override
     public void shutdown() {
-        dataSource.close();
+        ((HikariDataSource) queryConfiguration.dataSource()).close();
     }
 }

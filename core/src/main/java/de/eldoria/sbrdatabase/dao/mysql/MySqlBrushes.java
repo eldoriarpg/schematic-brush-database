@@ -7,48 +7,51 @@
 package de.eldoria.sbrdatabase.dao.mysql;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BaseBrushes;
 import de.eldoria.schematicbrush.storage.brush.BrushContainer;
 
-import javax.sql.DataSource;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import static de.chojo.sadu.queries.converter.StandardValueConverter.UUID_BYTES;
+
 public class MySqlBrushes extends BaseBrushes {
     private final ObjectMapper mapper;
 
-    public MySqlBrushes(DataSource dataSource, Configuration configuration, ObjectMapper mapper) {
-        super(dataSource, configuration);
+    public MySqlBrushes(QueryConfiguration config, Configuration configuration, ObjectMapper mapper) {
+        super(config, configuration);
         this.mapper = mapper;
     }
 
     @Override
     public CompletableFuture<Map<UUID, ? extends BrushContainer>> playerContainers() {
-        return builder(UUID.class).query("""
-                        SELECT DISTINCT uuid
-                        FROM brushes
-                        WHERE uuid IS NOT NULL
-                        """)
-                .emptyParams()
-                .readRow(resultSet -> resultSet.getUuidFromBytes("uuid"))
+        return CompletableFuture.supplyAsync(() -> query("""
+                SELECT DISTINCT uuid
+                FROM brushes
+                WHERE uuid IS NOT NULL
+                """)
+                .single()
+                .map(resultSet -> resultSet.get("uuid", UUID_BYTES))
                 .all()
-                .thenApply(uuids -> uuids.stream().collect(Collectors.toMap(uuid -> uuid, this::playerContainer)));
+                .stream()
+                .collect(Collectors.toMap(uuid -> uuid, this::playerContainer)));
     }
 
     @Override
     public CompletableFuture<Integer> count() {
-        return builder(Integer.class).query("SELECT count(1) AS count FROM brushes;")
-                .emptyParams()
-                .readRow(rs -> rs.getInt("count"))
+        return CompletableFuture.supplyAsync(() -> query("SELECT count(1) AS count FROM brushes;")
+                .single()
+                .map(rs -> rs.getInt("count"))
                 .first()
-                .thenApply(res -> res.orElse(0));
+                .orElse(0));
     }
 
     @Override
     public BrushContainer getContainer(UUID uuid) {
-        return new MySqlBrushContainer(uuid, configuration(), this, mapper);
+        return new MySqlBrushContainer(uuid, configuration(), queryConfiguration(), mapper);
     }
 }

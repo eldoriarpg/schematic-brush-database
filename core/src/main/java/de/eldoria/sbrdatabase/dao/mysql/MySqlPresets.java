@@ -7,48 +7,53 @@
 package de.eldoria.sbrdatabase.dao.mysql;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BasePresets;
 import de.eldoria.schematicbrush.storage.preset.PresetContainer;
 
-import javax.sql.DataSource;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import static de.chojo.sadu.queries.converter.StandardValueConverter.UUID_BYTES;
+
 public class MySqlPresets extends BasePresets {
     private final ObjectMapper mapper;
 
-    public MySqlPresets(DataSource dataSource, Configuration configuration, ObjectMapper mapper) {
-        super(dataSource, configuration);
+    public MySqlPresets(QueryConfiguration queryConfiguration, Configuration configuration, ObjectMapper mapper) {
+        super(queryConfiguration, configuration);
         this.mapper = mapper;
     }
 
     @Override
     public CompletableFuture<Map<UUID, ? extends PresetContainer>> playerContainers() {
-        return builder(UUID.class).query("""
+        return CompletableFuture.supplyAsync(() ->
+                query("""
                         SELECT DISTINCT uuid
                         FROM presets
                         WHERE uuid IS NOT NULL
                         """)
-                .emptyParams()
-                .readRow(resultSet -> resultSet.getUuidFromBytes("uuid"))
-                .all()
-                .thenApply(uuids -> uuids.stream().collect(Collectors.toMap(uuid -> uuid, this::playerContainer)));
+                        .single()
+                        .map(row -> row.get("uuid", UUID_BYTES))
+                        .all()
+                        .stream()
+                        .collect(Collectors.toMap(uuid -> uuid, this::playerContainer))
+        );
     }
 
     @Override
     public CompletableFuture<Integer> count() {
-        return builder(Integer.class).query("SELECT count(1) AS count FROM presets;")
-                .emptyParams()
-                .readRow(rs -> rs.getInt("count"))
+        return CompletableFuture.supplyAsync(() -> query("SELECT count(1) AS count FROM presets;")
+                .single()
+                .map(rs -> rs.getInt("count"))
                 .first()
-                .thenApply(res -> res.orElse(0));
+                .orElse(0));
     }
 
     @Override
     public PresetContainer getContainer(UUID uuid) {
-        return new MySqlPresetContainer(uuid, configuration(), this, mapper);
+        return new MySqlPresetContainer(uuid, configuration(), queryConfiguration(), mapper);
     }
 }

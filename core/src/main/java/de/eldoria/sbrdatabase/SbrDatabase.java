@@ -9,18 +9,18 @@ package de.eldoria.sbrdatabase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.zaxxer.hikari.HikariDataSource;
-import de.chojo.sadu.databases.Database;
-import de.chojo.sadu.databases.MariaDb;
-import de.chojo.sadu.databases.MySql;
-import de.chojo.sadu.databases.PostgreSql;
+import de.chojo.sadu.core.databases.Database;
+import de.chojo.sadu.core.jdbc.RemoteJdbcConfig;
+import de.chojo.sadu.core.updater.SqlVersion;
+import de.chojo.sadu.core.updater.UpdaterBuilder;
 import de.chojo.sadu.datasource.DataSourceCreator;
 import de.chojo.sadu.datasource.stage.ConfigurationStage;
-import de.chojo.sadu.jdbc.RemoteJdbcConfig;
+import de.chojo.sadu.mariadb.databases.MariaDb;
+import de.chojo.sadu.mysql.databases.MySql;
+import de.chojo.sadu.postgresql.databases.PostgreSql;
+import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import de.chojo.sadu.updater.QueryReplacement;
 import de.chojo.sadu.updater.SqlUpdater;
-import de.chojo.sadu.updater.SqlVersion;
-import de.chojo.sadu.updater.UpdaterBuilder;
-import de.chojo.sadu.wrapper.QueryBuilderConfig;
 import de.eldoria.eldoutilities.config.template.PluginBaseConfiguration;
 import de.eldoria.eldoutilities.plugin.EldoPlugin;
 import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateChecker;
@@ -44,8 +44,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
@@ -54,14 +52,8 @@ public class SbrDatabase extends EldoPlugin {
     private static final Nameable mysql = Nameable.of("mysql");
     private static final Nameable postgres = Nameable.of("postgres");
     public static final Nameable[] sqlTypes = {mariadb, mysql, postgres};
-    private final Thread.UncaughtExceptionHandler exceptionHandler = (thread, err) -> EldoPlugin.logger().log(Level.SEVERE, "Unhandled exception occured in thread " + thread.getName() + "-" + thread.getId(), err);
     private ObjectMapper mapper;
     private final List<HikariDataSource> sources = new ArrayList<>();
-    private final ExecutorService executor = Executors.newCachedThreadPool(run -> {
-        var thread = new Thread(run, "DbThreads");
-        thread.setUncaughtExceptionHandler(exceptionHandler);
-        return thread;
-    });
     private JacksonConfiguration configuration;
     private SchematicBrushReborn sbr;
 
@@ -70,8 +62,8 @@ public class SbrDatabase extends EldoPlugin {
         sbr = SchematicBrushReborn.instance();
         var builder = JsonMapper.builder();
         mapper = sbr.configureMapper(builder);
-        QueryBuilderConfig.setDefault(QueryBuilderConfig.builder()
-                .withExceptionHandler(ex -> EldoPlugin.logger().log(Level.SEVERE, "SQL Exception occured.", ex))
+        QueryConfiguration.setDefault(QueryConfiguration.builder(null)
+                .setExceptionHandler(ex -> getLogger().log(Level.SEVERE, "SQL Exception occurred.", ex))
                 .build());
 
         configuration = new JacksonConfiguration(this);
@@ -96,7 +88,6 @@ public class SbrDatabase extends EldoPlugin {
 
     @Override
     public void onPluginDisable() throws Throwable {
-        executor.shutdown();
         configuration.save();
         for (HikariDataSource source : sources) {
             source.close();
@@ -133,7 +124,7 @@ public class SbrDatabase extends EldoPlugin {
 
     private void setupMariaDb() throws IOException, SQLException {
         var source = applyBaseDb(MariaDb.get(), configuration.storages().mariadb()).build();
-        sbr.storageRegistry().register(SbrDatabase.mariadb, new MariaDbStorage(source, configuration, mapper));
+        sbr.storageRegistry().register(SbrDatabase.mariadb, new MariaDbStorage(QueryConfiguration.getDefault().edit(source).build(), configuration, mapper));
         SqlUpdater.builder(source, MariaDb.get())
                 .withClassLoader(getClassLoader())
                 .setVersionTable("sbr_version")
@@ -144,7 +135,7 @@ public class SbrDatabase extends EldoPlugin {
 
     private void setupMySql() throws IOException, SQLException {
         var source = applyBaseDb(MySql.get(), configuration.storages().mysql()).build();
-        sbr.storageRegistry().register(SbrDatabase.mysql, new MySqlStorage(source, configuration, mapper));
+        sbr.storageRegistry().register(SbrDatabase.mysql, new MySqlStorage(QueryConfiguration.getDefault().edit(source).build(), configuration, mapper));
         SqlUpdater.builder(source, MySql.get())
                 .withClassLoader(getClassLoader())
                 .setVersionTable("sbr_version")
@@ -159,9 +150,8 @@ public class SbrDatabase extends EldoPlugin {
                 .forSchema(postgres.schema())
                 .build();
 
-
         var update = applyBaseDb(PostgreSql.get(), postgres).build();
-        sbr.storageRegistry().register(SbrDatabase.postgres, new PostgresStorage(source, configuration, mapper));
+        sbr.storageRegistry().register(SbrDatabase.postgres, new PostgresStorage(QueryConfiguration.getDefault().edit(source).build(), configuration, mapper));
         SqlUpdater.builder(update, PostgreSql.get())
                 .withClassLoader(getClassLoader())
                 .setReplacements(new QueryReplacement("sbr_database", postgres.schema()))

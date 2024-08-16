@@ -7,8 +7,7 @@
 package de.eldoria.sbrdatabase.dao.mysql;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.chojo.sadu.base.QueryFactory;
-import de.chojo.sadu.wrapper.util.UpdateResult;
+import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BaseContainer;
 import de.eldoria.schematicbrush.storage.preset.Preset;
@@ -21,72 +20,71 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static de.chojo.sadu.queries.api.call.Call.call;
+import static de.chojo.sadu.queries.converter.StandardValueConverter.UUID_BYTES;
+
 public class MySqlPresetContainer extends BaseContainer<Preset> implements PresetContainer {
 
-    public MySqlPresetContainer(@Nullable UUID uuid, Configuration configuration, QueryFactory factoryHolder, ObjectMapper mapper) {
-        super(uuid, configuration, factoryHolder, mapper);
+    public MySqlPresetContainer(@Nullable UUID uuid, Configuration configuration, QueryConfiguration config, ObjectMapper mapper) {
+        super(uuid, configuration, config, mapper);
     }
 
     @Override
     public CompletableFuture<Optional<Preset>> get(String name) {
-        return builder(Preset.class).query("SELECT preset FROM presets WHERE uuid = ? AND name LIKE ?")
-                .parameter(stmt -> stmt.setUuidAsBytes(owner())
-                        .setString(name))
-                .readRow(resultSet -> parseToObject(resultSet.getString("preset"), Preset.class))
-                .first();
+        return CompletableFuture.supplyAsync(() ->
+                query("SELECT preset FROM presets WHERE uuid = ? AND name LIKE ?")
+                        .single(call().bind(owner(), UUID_BYTES).bind(name))
+                        .map(resultSet -> parseToObject(resultSet.getString("preset"), Preset.class))
+                        .first());
     }
 
     @Override
     public CompletableFuture<List<Preset>> page(int page, int size) {
-        return builder(Preset.class).query("SELECT preset FROM presets WHERE uuid = ? ORDER BY name LIMIT ? OFFSET ?")
-                .parameter(stmt -> stmt.setUuidAsBytes(owner())
-                        .setInt(size)
-                        .setInt(size * page))
-                .readRow(rs -> parseToObject(rs.getString("preset"), Preset.class))
-                .all();
+        return CompletableFuture.supplyAsync(() ->
+                query("SELECT preset FROM presets WHERE uuid = ? ORDER BY name LIMIT ? OFFSET ?")
+                        .single(call().bind(owner(), UUID_BYTES).bind(size).bind(size * page))
+                        .map(rs -> parseToObject(rs.getString("preset"), Preset.class))
+                        .all());
     }
 
     @Override
     public CompletableFuture<Void> add(Preset preset) {
-        return builder().query("INSERT INTO presets(uuid, name, preset) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE preset = ?")
-                .parameter(stmt -> stmt.setUuidAsBytes(owner())
-                        .setString(preset.name())
-                        .setString(parseToString(preset))
-                        .setString(parseToString(preset))).insert().execute().thenApply(r -> null);
+        return CompletableFuture.runAsync(() ->
+                query("INSERT INTO presets(uuid, name, preset) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE preset = VALUES(preset)")
+                        .single(call().bind(owner(), UUID_BYTES).bind(preset.name()).bind(parseToString(preset)))
+                        .insert());
     }
 
     @Override
     public CompletableFuture<Collection<Preset>> all() {
-        return builder(Preset.class).query("SELECT uuid, name, preset FROM presets WHERE uuid = ?")
-                .parameter(stmt -> stmt.setUuidAsBytes(owner()))
-                .readRow(resultSet -> parseToObject(resultSet.getString("preset"), Preset.class))
-                .all()
-                .thenApply(list -> list);
+        return CompletableFuture.supplyAsync(() ->
+                query("SELECT uuid, name, preset FROM presets WHERE uuid = ?")
+                .single(call().bind(owner(), UUID_BYTES))
+                .map(resultSet -> parseToObject(resultSet.getString("preset"), Preset.class))
+                .all());
     }
 
     @Override
     public CompletableFuture<Boolean> remove(String name) {
-        return builder(Boolean.class).query("DELETE FROM presets WHERE uuid = ? AND name LIKE ?")
-                .parameter(stmt -> stmt.setUuidAsBytes(owner())
-                        .setString(name))
+        return CompletableFuture.supplyAsync(() -> query("DELETE FROM presets WHERE uuid = ? AND name LIKE ?")
+                .single(call().bind(owner(), UUID_BYTES).bind(name))
                 .delete()
-                .send()
-                .thenApply(UpdateResult::changed);
+                .changed());
     }
 
     @Override
     protected CompletableFuture<List<String>> retrieveNames() {
-        return builder(String.class).query("SELECT name FROM presets WHERE uuid = ?")
-                .parameter(stmt -> stmt.setUuidAsBytes(owner()))
-                .readRow(resultSet -> resultSet.getString("name"))
-                .all();
+        return CompletableFuture.supplyAsync(() ->query("SELECT name FROM presets WHERE uuid = ?")
+                .single(call().bind(owner(), UUID_BYTES))
+                .map(row -> row.getString("name"))
+                .all());
     }
 
     @Override
     public CompletableFuture<Integer> size() {
-        return builder(Integer.class).query("SELECT count(1) as count FROM presets WHERE uuid = ?")
-                .parameter(stmt -> stmt.setUuidAsBytes(owner()))
-                .readRow(rs -> rs.getInt("count"))
-                .first().thenApply(e -> e.orElse(0));
+        return CompletableFuture.supplyAsync( () ->query("SELECT count(1) as count FROM presets WHERE uuid = ?")
+                .single(call().bind(owner(), UUID_BYTES))
+                .map(rs -> rs.getInt("count"))
+                .first().orElse(0));
     }
 }

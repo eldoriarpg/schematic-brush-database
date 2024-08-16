@@ -1,4 +1,7 @@
 rootProject.name = "schematic-brush-database"
+include("core")
+include("legacy")
+include("latest")
 
 pluginManagement{
     repositories{
@@ -14,7 +17,7 @@ pluginManagement{
 dependencyResolutionManagement{
     versionCatalogs{
         create("libs"){
-            version("sadu", "1.4.1")
+            version("sadu", "2.2.4")
 
             library("sadu-core","de.chojo.sadu", "sadu-core").versionRef("sadu")
             library("sadu-queries","de.chojo.sadu", "sadu-queries").versionRef("sadu")
@@ -32,6 +35,3 @@ dependencyResolutionManagement{
         }
     }
 }
-include("core")
-include("legacy")
-include("latest")
