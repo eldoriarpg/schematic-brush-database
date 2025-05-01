@@ -12,7 +12,7 @@ publishData {
     publishTask("sourcesJar")
 }
 
-dependencies{
+dependencies {
     implementation(project(":core"))
 }
 
@@ -46,9 +46,10 @@ tasks {
         println("Copying jar to $path")
         from(shadowJar)
         into(path.toString())
-        rename{"schematic-brush-database.jar"}
+        rename { "schematic-brush-database.jar" }
     }
     shadowJar {
+        relocate("de.eldoria.eldoutilities", "de.eldoria.schematicbrush.libs.eldoutilities")
         mergeServiceFiles()
     }
 
