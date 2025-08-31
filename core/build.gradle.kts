@@ -23,7 +23,7 @@ dependencies {
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.11.0")
     testImplementation("de.eldoria", "schematicbrushreborn-api", "2.7.1")
     testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
-    testImplementation("com.fasterxml.jackson.core", "jackson-databind", "2.17.2")
+    testImplementation("com.fasterxml.jackson.core", "jackson-databind", "2.20.0")
 
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine")
 }
