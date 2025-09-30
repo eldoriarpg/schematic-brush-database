@@ -1,6 +1,5 @@
 rootProject.name = "schematic-brush-database"
 include("core")
-include("legacy")
 include("latest")
 
 pluginManagement{
@@ -29,9 +28,10 @@ dependencyResolutionManagement{
             bundle("sadu", listOf("sadu-core","sadu-queries", "sadu-datasource", "sadu-updater","sadu-postgresql","sadu-mariadb","sadu-mysql"))
 
             plugin("publishdata", "de.chojo.publishdata").version("1.4.0")
-            plugin("licenser", "org.cadixdev.licenser").version("0.6.1")
-            plugin("shadow", "io.github.goooler.shadow").version("8.1.8")
+            plugin("spotless", "com.diffplug.spotless").version("7.2.1")
+            plugin("shadow", "com.gradleup.shadow").version("9.0.2")
             plugin("pluginyml", "net.minecrell.plugin-yml.bukkit").version("0.6.0")
+            plugin("runserver", "xyz.jpenilla.run-paper").version("2.3.1")
         }
     }
 }

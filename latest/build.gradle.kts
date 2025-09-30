@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.publishdata)
     alias(libs.plugins.shadow)
+    alias (libs.plugins.runserver)
     `maven-publish`
 }
 
@@ -37,19 +38,17 @@ publishing {
 }
 
 tasks {
-    register<Copy>("copyToServer") {
-        val path = rootProject.property("targetDir") ?: "";
-        if (path.toString().isEmpty()) {
-            println("targetDir is not set in gradle properties")
-            return@register
+    runServer {
+        minecraftVersion("1.21.8")
+        downloadPlugins {
+            url("https://ci.athion.net/job/FastAsyncWorldEdit/1175/artifact/artifacts/FastAsyncWorldEdit-Paper-2.13.3-SNAPSHOT-1175.jar")
+            url("https://download.luckperms.net/1600/bukkit/loader/LuckPerms-Bukkit-5.5.14.jar")
         }
-        println("Copying jar to $path")
-        from(shadowJar)
-        into(path.toString())
-        rename { "schematic-brush-database.jar" }
+
+        jvmArgs("-Dcom.mojang.eula.agree=true")
     }
+
     shadowJar {
-        relocate("de.eldoria.eldoutilities", "de.eldoria.schematicbrush.libs.eldoutilities")
         mergeServiceFiles()
     }
 
