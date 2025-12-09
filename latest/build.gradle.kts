@@ -49,6 +49,10 @@ tasks {
     }
 
     shadowJar {
+        val shadebase = "de.eldoria.schematicbrush.libs."
+        relocate("de.eldoria.messageblocker", shadebase + "messageblocker")
+        relocate("com.fasterxml", shadebase + "fasterxml")
+        relocate("de.eldoria.utilities", shadebase + "utilities")
         mergeServiceFiles()
     }
 
