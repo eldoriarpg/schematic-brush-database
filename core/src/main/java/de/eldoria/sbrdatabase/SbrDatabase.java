@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.zaxxer.hikari.HikariDataSource;
 import de.chojo.sadu.core.databases.Database;
+import de.chojo.sadu.core.exceptions.ThrowingConsumer;
 import de.chojo.sadu.core.jdbc.RemoteJdbcConfig;
 import de.chojo.sadu.core.updater.SqlVersion;
 import de.chojo.sadu.core.updater.UpdaterBuilder;
@@ -44,10 +45,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public class SbrDatabase extends EldoPlugin {
@@ -175,7 +176,7 @@ public class SbrDatabase extends EldoPlugin {
     }
 
     @SuppressWarnings("AssignmentToStaticFieldFromInstanceMethod")
-    private Consumer<java.sql.Connection> version_1_1_migration(Nameable current) {
+    private ThrowingConsumer<Connection, SQLException> version_1_1_migration(Nameable current) throws SQLException {
         return conn -> {
             BaseContainer.legacySerialization = true;
             sbr.storageRegistry().migrate(current, StorageRegistry.YAML).join();

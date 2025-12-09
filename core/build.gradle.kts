@@ -10,14 +10,14 @@ publishData {
 
 dependencies {
     bukkitLibrary(libs.bundles.sadu)
-    bukkitLibrary("org.postgresql", "postgresql", "42.7.3")
+    bukkitLibrary("org.postgresql", "postgresql", "42.7.8")
     bukkitLibrary("org.mariadb.jdbc", "mariadb-java-client", "3.4.1")
     bukkitLibrary("mysql", "mysql-connector-java", "8.0.33")
     bukkitLibrary("com.zaxxer", "HikariCP", "5.1.0")
 
-    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.7.1")
+    compileOnly("de.eldoria", "schematicbrushreborn-api", "2.7.8")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
-    compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.3.6")
+    compileOnly("com.sk89q.worldedit", "worldedit-bukkit", "7.3.17")
 
 
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.11.0")

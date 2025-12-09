@@ -16,7 +16,7 @@ pluginManagement{
 dependencyResolutionManagement{
     versionCatalogs{
         create("libs"){
-            version("sadu", "2.2.4")
+            version("sadu", "2.3.4")
 
             library("sadu-core","de.chojo.sadu", "sadu-core").versionRef("sadu")
             library("sadu-queries","de.chojo.sadu", "sadu-queries").versionRef("sadu")
