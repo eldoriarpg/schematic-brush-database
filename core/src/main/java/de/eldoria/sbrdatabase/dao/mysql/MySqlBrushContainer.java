@@ -48,7 +48,7 @@ public class MySqlBrushContainer extends BaseContainer<Brush> implements BrushCo
     @Override
     public CompletableFuture<Void> add(Brush preset) {
         return CompletableFuture.runAsync(() ->
-                query("INSERT INTO brushes(uuid, name, brush) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE brush = VALUES(preset)")
+                query("INSERT INTO brushes(uuid, name, brush) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE brush = VALUES(brush)")
                         .single(call().bind(owner(), UUID_BYTES).bind(preset.name()).bind(parseToString(preset)))
                         .insert());
     }
