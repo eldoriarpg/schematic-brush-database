@@ -6,3 +6,10 @@ services:
       - "3306:3306"
     environment:
       MARIADB_ROOT_PASSWORD: passy
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: passy
