@@ -42,7 +42,7 @@ tasks {
         minecraftVersion("1.21.8")
         downloadPlugins {
             url("https://ci.athion.net/job/FastAsyncWorldEdit/1175/artifact/artifacts/FastAsyncWorldEdit-Paper-2.13.3-SNAPSHOT-1175.jar")
-            url("https://download.luckperms.net/1600/bukkit/loader/LuckPerms-Bukkit-5.5.14.jar")
+            url("https://download.luckperms.net/1626/bukkit/loader/LuckPerms-Bukkit-5.5.38.jar")
         }
 
         jvmArgs("-Dcom.mojang.eula.agree=true")
