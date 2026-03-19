@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "de.eldoria.schematic-brush-database"
-version = "1.1.9"
+version = "1.1.10"
 
 allprojects {
     apply {
