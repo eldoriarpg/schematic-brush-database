@@ -1,3 +1,5 @@
+import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
+
 plugins {
     java
     `maven-publish`
@@ -27,6 +29,15 @@ dependencies {
 
     bukkitLibrary(libs.bundles.sadu)
     bukkitLibrary(libs.bundles.drivers)
+
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform.launcher)
+    testImplementation(libs.paper)
+    testImplementation(libs.schematicbrushreborn.api)
+    testImplementation(libs.bundles.utilities)
+    testImplementation(platform(libs.jackson.bom))
+    testImplementation(libs.bundles.jackson)
 }
 
 java {
@@ -47,7 +58,9 @@ spotless {
 publishData {
     eldoNexus(dev = false)
     component = "shadow"
-    buildData()
+    buildData {
+        put("lynaProduct", "9")
+    }
 }
 
 tasks {
@@ -62,6 +75,10 @@ tasks {
         relocate("de.eldoria.jacksonbukkit", shadebase + "jacksonbukkit")
         relocate("de.eldoria.eldoutilities", shadebase + "utilities")
         mergeServiceFiles()
+    }
+
+    test {
+        useJUnitPlatform()
     }
 
     build {
@@ -90,4 +107,11 @@ bukkit {
     version = project.version.toString()
     authors = listOf("RainbowDashLabs")
     depend = listOf("SchematicBrushReborn")
+
+    permissions {
+        register("schematicbrushdatabase.updates") {
+            description = "Hear about new SchematicBrushDatabase versions on join and download them"
+            default = BukkitPluginDescription.Permission.Default.OP
+        }
+    }
 }
