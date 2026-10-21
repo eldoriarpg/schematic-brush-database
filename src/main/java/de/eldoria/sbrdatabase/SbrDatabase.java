@@ -21,13 +21,12 @@ import de.chojo.sadu.updater.QueryReplacement;
 import de.chojo.sadu.updater.SqlUpdater;
 import de.eldoria.eldoutilities.config.template.PluginBaseConfiguration;
 import de.eldoria.eldoutilities.plugin.EldoPlugin;
-import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateChecker;
-import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateData;
 import de.eldoria.sbrdatabase.configuration.JacksonConfiguration;
 import de.eldoria.sbrdatabase.configuration.elements.storages.BaseDbConfig;
 import de.eldoria.sbrdatabase.dao.mariadb.MariaDbStorage;
 import de.eldoria.sbrdatabase.dao.mysql.MySqlStorage;
 import de.eldoria.sbrdatabase.dao.postgres.PostgresStorage;
+import de.eldoria.sbrdatabase.updates.Updates;
 import de.eldoria.schematicbrush.SchematicBrushReborn;
 import de.eldoria.schematicbrush.brush.config.util.Nameable;
 import tools.jackson.databind.ObjectMapper;
@@ -49,6 +48,7 @@ public class SbrDatabase extends EldoPlugin {
     private final List<HikariDataSource> sources = new ArrayList<>();
     private final JacksonConfiguration configuration;
     private SchematicBrushReborn sbr;
+    private Updates updates;
 
     public SbrDatabase() {
         configuration = new JacksonConfiguration(this);
@@ -70,16 +70,19 @@ public class SbrDatabase extends EldoPlugin {
             configuration.save();
         }
 
-        if (configuration.main().checkUpdates()) {
-            LynaUpdateChecker.lyna(LynaUpdateData.builder(this, 9).build()).start();
-        }
-
         registerStorageTypes();
         configuration.save();
     }
 
     @Override
+    public void onPluginEnable() throws Throwable {
+        updates = new Updates(this, configuration);
+        updates.apply();
+    }
+
+    @Override
     public void onPluginDisable() throws Throwable {
+        if (updates != null) updates.stop();
         configuration.save();
         for (HikariDataSource source : sources) {
             source.close();
