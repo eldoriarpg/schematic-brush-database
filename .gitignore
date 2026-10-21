@@ -1,8 +1,10 @@
 # Remove config
 /config/
 
+# Test server
+run/
+
 .gradle
-gradle.properties
 **/build/
 !src/**/build/
 

@@ -1,0 +1,29 @@
+/*
+ *     SPDX-License-Identifier: AGPL-3.0-only
+ *
+ *     Copyright (C) EldoriaRPG Team and Contributor
+ */
+package de.eldoria.sbrdatabase.dao.postgres;
+
+import tools.jackson.databind.ObjectMapper;
+import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
+import de.eldoria.sbrdatabase.configuration.Configuration;
+import de.eldoria.sbrdatabase.dao.mariadb.MariaDbPresets;
+import de.eldoria.schematicbrush.storage.preset.PresetContainer;
+import de.eldoria.schematicbrush.storage.preset.Presets;
+
+import java.util.UUID;
+
+public class PostgresPresets extends MariaDbPresets implements Presets {
+    private final ObjectMapper mapper;
+
+    public PostgresPresets(QueryConfiguration queryConfiguration, Configuration configuration, ObjectMapper mapper) {
+        super(queryConfiguration, configuration, mapper);
+        this.mapper = mapper;
+    }
+
+    @Override
+    public PresetContainer getContainer(UUID uuid) {
+        return new PostgresPresetContainer(uuid, configuration(), queryConfiguration(), mapper);
+    }
+}
