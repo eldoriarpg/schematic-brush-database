@@ -32,7 +32,7 @@ sadu-mariadb = { module = "de.chojo.sadu:sadu-mariadb", version.ref = "sadu" }
 sadu-mysql = { module = "de.chojo.sadu:sadu-mysql", version.ref = "sadu" }
 
 postgresql = "org.postgresql:postgresql:42.7.14"
-mariadb = "org.mariadb.jdbc:mariadb-java-client:3.5.11"
+mariadb = "org.mariadb.jdbc:mariadb-java-client:3.5.10"
 mysql = "com.mysql:mysql-connector-j:8.4.0"
 
 [bundles]
