@@ -1,0 +1,45 @@
+[versions]
+jackson = "3.2.4"
+utilities = "3.1.0"
+paper = "1.21.11-R0.1-SNAPSHOT"
+sadu = "2.3.9"
+
+[libraries]
+schematicbrushreborn-api = "de.eldoria:schematicbrushreborn-api:3.0.0-SNAPSHOT"
+
+jackson-bom = { module = "tools.jackson:jackson-bom", version.ref = "jackson" }
+jackson-databind = { module = "tools.jackson.core:jackson-databind" }
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations" }
+
+eldoutil-plugin = { module = "de.eldoria.util:plugin", version.ref = "utilities" }
+eldoutil-jackson = { module = "de.eldoria.util:jackson-configuration", version.ref = "utilities" }
+eldoutil-updater = { module = "de.eldoria.util:updater", version.ref = "utilities" }
+ocular = "dev.chojo:ocular:2.3.1"
+
+jetbrains-annotations = "org.jetbrains:annotations:26.1.0"
+paper = { module = "io.papermc.paper:paper-api", version.ref = "paper" }
+
+sadu-core = { module = "de.chojo.sadu:sadu-core", version.ref = "sadu" }
+sadu-queries = { module = "de.chojo.sadu:sadu-queries", version.ref = "sadu" }
+sadu-datasource = { module = "de.chojo.sadu:sadu-datasource", version.ref = "sadu" }
+sadu-updater = { module = "de.chojo.sadu:sadu-updater", version.ref = "sadu" }
+sadu-postgresql = { module = "de.chojo.sadu:sadu-postgresql", version.ref = "sadu" }
+sadu-mariadb = { module = "de.chojo.sadu:sadu-mariadb", version.ref = "sadu" }
+sadu-mysql = { module = "de.chojo.sadu:sadu-mysql", version.ref = "sadu" }
+
+postgresql = "org.postgresql:postgresql:42.7.14"
+mariadb = "org.mariadb.jdbc:mariadb-java-client:3.5.11"
+mysql = "com.mysql:mysql-connector-j:8.4.0"
+
+[bundles]
+jackson = ["jackson-databind", "jackson-annotations"]
+utilities = ["eldoutil-jackson", "eldoutil-plugin", "eldoutil-updater", "ocular"]
+sadu = ["sadu-core", "sadu-queries", "sadu-datasource", "sadu-updater", "sadu-postgresql", "sadu-mariadb", "sadu-mysql"]
+drivers = ["postgresql", "mariadb", "mysql"]
+
+[plugins]
+spotless = { id = "com.diffplug.spotless", version = "8.10.4" }
+publishdata = { id = "de.chojo.publishdata", version = "2.0.0" }
+shadow = { id = "com.gradleup.shadow", version = "9.6.1" }
+pluginyml-bukkit = { id = "de.eldoria.plugin-yml.bukkit", version = "0.9.0" }
+runserver = { id = "xyz.jpenilla.run-paper", version = "3.1.0" }
