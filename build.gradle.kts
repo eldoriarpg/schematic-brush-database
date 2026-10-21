@@ -42,7 +42,7 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
     withSourcesJar()
     withJavadocJar()
@@ -87,9 +87,6 @@ tasks {
 
     runServer {
         minecraftVersion("26.3")
-        javaLauncher = project.javaToolchains.launcherFor {
-            languageVersion = JavaLanguageVersion.of(25)
-        }
         downloadPlugins {
             modrinth("fastasyncworldedit", "2.16.1")
             modrinth("luckperms", "v5.5.71-bukkit")
