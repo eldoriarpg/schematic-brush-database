@@ -5,55 +5,14 @@
  */
 package de.eldoria.sbrdatabase.configuration.elements.storages;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import de.eldoria.eldoutilities.serialization.SerializationUtil;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.configuration.serialization.SerializableAs;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Map;
-
-@SerializableAs("sbdDbConfig")
-public class BaseDbConfig implements ConfigurationSerializable {
-    protected String host;
-    protected String port;
-    protected String database;
-    protected String user;
-    protected String password;
-    protected int connections;
-
-    public BaseDbConfig() {
-        connections = 3;
-        password = "passy";
-        user = "root";
-        database = "public";
-        port = "3306";
-        host = "localhost";
-    }
-
-    public BaseDbConfig(Map<String, Object> objectMap) {
-        var map = SerializationUtil.mapOf(objectMap);
-        host = map.getValueOrDefault("host", "localhost");
-        port = map.getValueOrDefault("port", "3306");
-        database = map.getValueOrDefault("database", "public");
-        user = map.getValueOrDefault("user", "root");
-        password = map.getValueOrDefault("password", "passy");
-        connections = map.getValueOrDefault("connections", 3);
-    }
-
-    @Override
-    @NotNull
-    public Map<String, Object> serialize() {
-        return SerializationUtil.newBuilder()
-                .add("host", host)
-                .add("port", port)
-                .add("database", database)
-                .add("user", user)
-                .add("password", password)
-                .add("connections", connections)
-                .build();
-    }
+@SuppressWarnings({"FieldMayBeFinal"})
+public class BaseDbConfig {
+    protected String host = "localhost";
+    protected String port = "3306";
+    protected String database = "public";
+    protected String user = "root";
+    protected String password = "passy";
+    protected int connections = 3;
 
     public String host() {
         return host;

@@ -5,8 +5,6 @@
  */
 package de.eldoria.sbrdatabase;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.zaxxer.hikari.HikariDataSource;
 import de.chojo.sadu.core.databases.Database;
 import de.chojo.sadu.core.exceptions.ThrowingConsumer;
@@ -26,24 +24,15 @@ import de.eldoria.eldoutilities.plugin.EldoPlugin;
 import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateChecker;
 import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateData;
 import de.eldoria.sbrdatabase.configuration.JacksonConfiguration;
-import de.eldoria.sbrdatabase.configuration.LegacyConfiguration;
-import de.eldoria.sbrdatabase.configuration.elements.Cache;
-import de.eldoria.sbrdatabase.configuration.elements.Storages;
 import de.eldoria.sbrdatabase.configuration.elements.storages.BaseDbConfig;
-import de.eldoria.sbrdatabase.configuration.elements.storages.PostgresDbConfig;
-import de.eldoria.sbrdatabase.dao.base.BaseContainer;
 import de.eldoria.sbrdatabase.dao.mariadb.MariaDbStorage;
 import de.eldoria.sbrdatabase.dao.mysql.MySqlStorage;
 import de.eldoria.sbrdatabase.dao.postgres.PostgresStorage;
 import de.eldoria.schematicbrush.SchematicBrushReborn;
 import de.eldoria.schematicbrush.brush.config.util.Nameable;
-import de.eldoria.schematicbrush.storage.StorageRegistry;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.java.JavaPluginLoader;
-import org.jetbrains.annotations.NotNull;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -58,15 +47,10 @@ public class SbrDatabase extends EldoPlugin {
     public static final Nameable[] sqlTypes = {mariadb, mysql, postgres};
     private ObjectMapper mapper;
     private final List<HikariDataSource> sources = new ArrayList<>();
-    private JacksonConfiguration configuration;
+    private final JacksonConfiguration configuration;
     private SchematicBrushReborn sbr;
 
     public SbrDatabase() {
-        configuration = new JacksonConfiguration(this);
-    }
-
-    public SbrDatabase(@NotNull JavaPluginLoader loader, @NotNull PluginDescriptionFile description, @NotNull File dataFolder, @NotNull File file) {
-        super(loader, description, dataFolder, file);
         configuration = new JacksonConfiguration(this);
     }
 
@@ -81,10 +65,6 @@ public class SbrDatabase extends EldoPlugin {
 
         PluginBaseConfiguration base = configuration.secondary(PluginBaseConfiguration.KEY);
         if (base.version() == 0) {
-            var legacyConfiguration = new LegacyConfiguration(this);
-            getLogger().log(Level.INFO, "Migrating configuration to jackson.");
-            configuration.main().cache(legacyConfiguration.cache());
-            configuration.main().storages(legacyConfiguration.storages());
             base.version(1);
             base.lastInstalledVersion(this);
             configuration.save();
@@ -111,11 +91,6 @@ public class SbrDatabase extends EldoPlugin {
         return configuration.secondary(PluginBaseConfiguration.KEY).logLevel();
     }
 
-    @Override
-    public List<Class<? extends ConfigurationSerializable>> getConfigSerialization() {
-        return List.of(Storages.class, BaseDbConfig.class, PostgresDbConfig.class, Cache.class);
-    }
-
     private void registerStorageTypes() throws IOException, SQLException {
         var storages = configuration.storages();
         boolean active = false;
@@ -136,24 +111,24 @@ public class SbrDatabase extends EldoPlugin {
 
     private void setupMariaDb() throws IOException, SQLException {
         var source = applyBaseDb(MariaDb.get(), configuration.storages().mariadb()).build();
-        sbr.storageRegistry().register(SbrDatabase.mariadb, new MariaDbStorage(QueryConfiguration.getDefault().edit(source).build(), configuration, mapper));
+        sources.add(source);
         SqlUpdater.builder(source, MariaDb.get())
                 .withClassLoader(getClassLoader())
                 .setVersionTable("sbr_version")
-                .postUpdateHook(new SqlVersion(1, 1), version_1_1_migration(SbrDatabase.mariadb))
+                .preUpdateHook(new SqlVersion(1, 1), rejectYamlEntries(""))
                 .execute();
-        sources.add(source);
+        sbr.storageRegistry().register(SbrDatabase.mariadb, new MariaDbStorage(QueryConfiguration.getDefault().edit(source).build(), configuration, mapper));
     }
 
     private void setupMySql() throws IOException, SQLException {
         var source = applyBaseDb(MySql.get(), configuration.storages().mysql()).build();
-        sbr.storageRegistry().register(SbrDatabase.mysql, new MySqlStorage(QueryConfiguration.getDefault().edit(source).build(), configuration, mapper));
+        sources.add(source);
         SqlUpdater.builder(source, MySql.get())
                 .withClassLoader(getClassLoader())
                 .setVersionTable("sbr_version")
-                .postUpdateHook(new SqlVersion(1, 1), version_1_1_migration(SbrDatabase.mysql))
+                .preUpdateHook(new SqlVersion(1, 1), rejectYamlEntries(""))
                 .execute();
-        sources.add(source);
+        sbr.storageRegistry().register(SbrDatabase.mysql, new MySqlStorage(QueryConfiguration.getDefault().edit(source).build(), configuration, mapper));
     }
 
     private void setupPostgres() throws IOException, SQLException {
@@ -161,27 +136,36 @@ public class SbrDatabase extends EldoPlugin {
         var source = applyBaseDb(PostgreSql.get(), postgres)
                 .forSchema(postgres.schema())
                 .build();
+        sources.add(source);
 
         var update = applyBaseDb(PostgreSql.get(), postgres).build();
-        sbr.storageRegistry().register(SbrDatabase.postgres, new PostgresStorage(QueryConfiguration.getDefault().edit(source).build(), configuration, mapper));
         SqlUpdater.builder(update, PostgreSql.get())
                 .withClassLoader(getClassLoader())
                 .setReplacements(new QueryReplacement("sbr_database", postgres.schema()))
                 .setSchemas(postgres.schema())
                 .setVersionTable("sbr_version")
-                .postUpdateHook(new SqlVersion(1, 1), version_1_1_migration(SbrDatabase.postgres))
+                .preUpdateHook(new SqlVersion(1, 1), rejectYamlEntries(postgres.schema() + "."))
                 .execute();
         update.close();
-        sources.add(source);
+        sbr.storageRegistry().register(SbrDatabase.postgres, new PostgresStorage(QueryConfiguration.getDefault().edit(source).build(), configuration, mapper));
     }
 
-    @SuppressWarnings("AssignmentToStaticFieldFromInstanceMethod")
-    private ThrowingConsumer<Connection, SQLException> version_1_1_migration(Nameable current) throws SQLException {
+    /**
+     * Stops the update of a database that still stores brushes and presets in the YAML format written before version
+     * 1.1. Converting them requires the serialization of Schematic Brush Reborn 2, so such a database has to be updated
+     * with a 1.x release of this plugin first. A freshly created database passes, as it holds no entries yet.
+     *
+     * @param tablePrefix prefix that qualifies the table names, e.g. a schema followed by a dot
+     * @return hook to run before the update to version 1.1
+     */
+    private ThrowingConsumer<Connection, SQLException> rejectYamlEntries(String tablePrefix) {
         return conn -> {
-            BaseContainer.legacySerialization = true;
-            sbr.storageRegistry().migrate(current, StorageRegistry.YAML).join();
-            BaseContainer.legacySerialization = false;
-            sbr.storageRegistry().migrate(StorageRegistry.YAML, current).join();
+            var query = "SELECT (SELECT count(1) FROM %1$sbrushes) + (SELECT count(1) FROM %1$spresets) AS count".formatted(tablePrefix);
+            try (var stmt = conn.prepareStatement(query); var rs = stmt.executeQuery()) {
+                if (rs.next() && rs.getLong("count") > 0) {
+                    throw new SQLException("The database contains brushes or presets stored before version 1.1. Update it with SchematicBrushDatabase 1.1.10 before using version 2.");
+                }
+            }
         };
     }
 

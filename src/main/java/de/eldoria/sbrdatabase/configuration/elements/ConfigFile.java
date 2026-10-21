@@ -8,13 +8,8 @@ package de.eldoria.sbrdatabase.configuration.elements;
 @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 public class ConfigFile {
     private boolean checkUpdates = true;
-    private Storages storages;
-    private Cache cache;
-
-    public ConfigFile() {
-        storages = new Storages();
-        cache = new Cache();
-    }
+    private Storages storages = new Storages();
+    private Cache cache = new Cache();
 
     public Storages storages() {
         return storages;
@@ -22,14 +17,6 @@ public class ConfigFile {
 
     public Cache cache() {
         return cache;
-    }
-
-    public void storages(Storages storages) {
-        this.storages = storages;
-    }
-
-    public void cache(Cache cache) {
-        this.cache = cache;
     }
 
     public boolean checkUpdates() {

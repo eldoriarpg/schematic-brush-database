@@ -5,14 +5,13 @@
  */
 package de.eldoria.sbrdatabase.dao.postgres;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.mariadb.MariaDbPresets;
 import de.eldoria.schematicbrush.storage.preset.PresetContainer;
 import de.eldoria.schematicbrush.storage.preset.Presets;
 
-import javax.sql.DataSource;
 import java.util.UUID;
 
 public class PostgresPresets extends MariaDbPresets implements Presets {

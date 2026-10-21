@@ -5,21 +5,18 @@
  */
 package de.eldoria.sbrdatabase.dao.base;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import de.chojo.sadu.queries.api.query.ParsedQuery;
 import de.chojo.sadu.queries.configuration.ConnectedQueryConfigurationImpl;
-import de.eldoria.eldoutilities.serialization.wrapper.YamlContainer;
 import de.eldoria.eldoutilities.utils.Futures;
 import de.eldoria.sbrdatabase.SbrDatabase;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.schematicbrush.storage.ContainerPagedAccess;
 import de.eldoria.schematicbrush.storage.base.Container;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import java.sql.SQLException;
 import java.time.Instant;
@@ -38,7 +35,6 @@ public abstract class BaseContainer<T> implements Container<T> {
     private final Configuration configuration;
     private Set<String> names = Collections.emptySet();
     private Instant lastRefresh = Instant.MIN;
-    public static boolean legacySerialization = false;
     private final QueryConfiguration queryConfiguration;
     private final ObjectMapper mapper;
 
@@ -49,22 +45,16 @@ public abstract class BaseContainer<T> implements Container<T> {
         this.mapper = mapper;
     }
 
-    protected <V extends ConfigurationSerializable> V parseToObject(String object, Class<V> clazz) throws SQLException {
+    protected <V> V parseToObject(String object, Class<V> clazz) throws SQLException {
         try {
-            if (legacySerialization) return YamlContainer.yamlToObject(object, clazz);
             return mapper.readValue(object, clazz);
-        } catch (InvalidConfigurationException | JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new SQLException("Could not deserialize object", e);
         }
     }
 
-    protected <V extends ConfigurationSerializable> String parseToString(V object) {
-        try {
-            if (legacySerialization) return YamlContainer.objectToYaml(object);
-            return mapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Could not serialize object", e);
-        }
+    protected <V> String parseToString(V object) {
+        return mapper.writeValueAsString(object);
     }
 
     public final Set<String> names() {

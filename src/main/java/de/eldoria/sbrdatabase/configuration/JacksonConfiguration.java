@@ -5,17 +5,19 @@
  */
 package de.eldoria.sbrdatabase.configuration;
 
-import de.eldoria.eldoutilities.config.ConfigKey;
 import de.eldoria.eldoutilities.config.JacksonConfig;
 import de.eldoria.sbrdatabase.configuration.elements.Cache;
 import de.eldoria.sbrdatabase.configuration.elements.ConfigFile;
 import de.eldoria.sbrdatabase.configuration.elements.Storages;
+import dev.chojo.ocular.key.Key;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Path;
+
 public class JacksonConfiguration extends JacksonConfig<ConfigFile> implements Configuration {
     public JacksonConfiguration(@NotNull Plugin plugin) {
-        super(plugin, ConfigKey.defaultConfig(ConfigFile.class, ConfigFile::new));
+        super(plugin, Key.builder(Path.of("config.yml"), ConfigFile::new).build());
     }
 
     @Override
