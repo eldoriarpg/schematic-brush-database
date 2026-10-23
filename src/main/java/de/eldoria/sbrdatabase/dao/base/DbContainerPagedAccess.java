@@ -24,7 +24,6 @@ public class DbContainerPagedAccess<T> implements ContainerPagedAccess<T> {
 
     @Override
     public int size() {
-        container.size().thenApply(size -> this.size);
         return size;
     }
 
