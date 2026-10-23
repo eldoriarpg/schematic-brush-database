@@ -35,8 +35,6 @@ import tools.jackson.databind.json.JsonMapper;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 
 public class SbrDatabase extends EldoPlugin {
@@ -45,7 +43,6 @@ public class SbrDatabase extends EldoPlugin {
     private static final Nameable postgres = Nameable.of("postgres");
     public static final Nameable[] sqlTypes = {mariadb, mysql, postgres};
     private ObjectMapper mapper;
-    private final List<HikariDataSource> sources = new ArrayList<>();
     private final JacksonConfiguration configuration;
     private SchematicBrushReborn sbr;
     private Updates updates;
@@ -84,9 +81,6 @@ public class SbrDatabase extends EldoPlugin {
     public void onPluginDisable() throws Throwable {
         if (updates != null) updates.stop();
         configuration.save();
-        for (HikariDataSource source : sources) {
-            source.close();
-        }
     }
 
     @Override
@@ -114,23 +108,21 @@ public class SbrDatabase extends EldoPlugin {
 
     private void setupMariaDb() throws IOException, SQLException {
         var source = applyBaseDb(MariaDb.get(), configuration.storages().mariadb()).build();
-        sources.add(source);
-        SqlUpdater.builder(source, MariaDb.get())
+        closeOnFailure(source, () -> SqlUpdater.builder(source, MariaDb.get())
                 .withClassLoader(getClassLoader())
                 .setVersionTable("sbr_version")
                 .preUpdateHook(new SqlVersion(1, 1), rejectYamlEntries(""))
-                .execute();
+                .execute());
         sbr.storageRegistry().register(SbrDatabase.mariadb, new MariaDbStorage(QueryConfiguration.getDefault().edit(source).build(), configuration, mapper));
     }
 
     private void setupMySql() throws IOException, SQLException {
         var source = applyBaseDb(MySql.get(), configuration.storages().mysql()).build();
-        sources.add(source);
-        SqlUpdater.builder(source, MySql.get())
+        closeOnFailure(source, () -> SqlUpdater.builder(source, MySql.get())
                 .withClassLoader(getClassLoader())
                 .setVersionTable("sbr_version")
                 .preUpdateHook(new SqlVersion(1, 1), rejectYamlEntries(""))
-                .execute();
+                .execute());
         sbr.storageRegistry().register(SbrDatabase.mysql, new MySqlStorage(QueryConfiguration.getDefault().edit(source).build(), configuration, mapper));
     }
 
@@ -139,18 +131,49 @@ public class SbrDatabase extends EldoPlugin {
         var source = applyBaseDb(PostgreSql.get(), postgres)
                 .forSchema(postgres.schema())
                 .build();
-        sources.add(source);
 
-        var update = applyBaseDb(PostgreSql.get(), postgres).build();
-        SqlUpdater.builder(update, PostgreSql.get())
-                .withClassLoader(getClassLoader())
-                .setReplacements(new QueryReplacement("sbr_database", postgres.schema()))
-                .setSchemas(postgres.schema())
-                .setVersionTable("sbr_version")
-                .preUpdateHook(new SqlVersion(1, 1), rejectYamlEntries(postgres.schema() + "."))
-                .execute();
-        update.close();
+        try (var update = applyBaseDb(PostgreSql.get(), postgres).build()) {
+            closeOnFailure(source, () -> SqlUpdater.builder(update, PostgreSql.get())
+                    .withClassLoader(getClassLoader())
+                    .setReplacements(new QueryReplacement("sbr_database", postgres.schema()))
+                    .setSchemas(postgres.schema())
+                    .setVersionTable("sbr_version")
+                    .preUpdateHook(new SqlVersion(1, 1), rejectYamlEntries(postgres.schema() + "."))
+                    .execute());
+        }
         sbr.storageRegistry().register(SbrDatabase.postgres, new PostgresStorage(QueryConfiguration.getDefault().edit(source).build(), configuration, mapper));
+    }
+
+    /**
+     * Runs the schema update for a new connection pool and closes the pool if the update fails. A pool that passes is
+     * handed to a storage, and Schematic Brush Reborn closes it when it shuts its storages down.
+     *
+     * @param source pool the storage will use
+     * @param update schema update to run
+     * @throws IOException  if the update scripts cannot be read
+     * @throws SQLException if the update fails
+     */
+    private void closeOnFailure(HikariDataSource source, SchemaUpdate update) throws IOException, SQLException {
+        try {
+            update.run();
+        } catch (IOException | SQLException | RuntimeException e) {
+            source.close();
+            throw e;
+        }
+    }
+
+    /**
+     * Schema update of one database.
+     */
+    @FunctionalInterface
+    private interface SchemaUpdate {
+        /**
+         * Brings the schema up to date.
+         *
+         * @throws IOException  if the update scripts cannot be read
+         * @throws SQLException if the update fails
+         */
+        void run() throws IOException, SQLException;
     }
 
     /**
