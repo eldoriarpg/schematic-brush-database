@@ -5,13 +5,16 @@
  */
 package de.eldoria.sbrdatabase.dao.postgres;
 
-import tools.jackson.databind.ObjectMapper;
 import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BaseStorage;
+import tools.jackson.databind.ObjectMapper;
 
 public class PostgresStorage extends BaseStorage {
-    public PostgresStorage(QueryConfiguration  queryConfiguration, Configuration configuration, ObjectMapper mapper) {
-        super(new PostgresPresets(queryConfiguration, configuration, mapper), new PostgresBrushes(queryConfiguration, configuration, mapper), queryConfiguration);
+    public PostgresStorage(QueryConfiguration queryConfiguration, Configuration configuration, ObjectMapper mapper) {
+        super(
+                new PostgresPresets(queryConfiguration, configuration, mapper),
+                new PostgresBrushes(queryConfiguration, configuration, mapper),
+                queryConfiguration);
     }
 }

@@ -5,7 +5,6 @@
  */
 package de.eldoria.sbrdatabase.dao.mysql;
 
-import tools.jackson.databind.ObjectMapper;
 import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BaseContainer;
@@ -13,6 +12,7 @@ import de.eldoria.sbrdatabase.dao.base.NameMatch;
 import de.eldoria.schematicbrush.storage.brush.Brush;
 import de.eldoria.schematicbrush.storage.brush.BrushContainer;
 import org.jetbrains.annotations.Nullable;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Collection;
 import java.util.List;
@@ -25,22 +25,23 @@ import static de.chojo.sadu.queries.converter.StandardValueConverter.UUID_BYTES;
 
 public class MySqlBrushContainer extends BaseContainer<Brush> implements BrushContainer {
 
-    public MySqlBrushContainer(@Nullable UUID uuid, Configuration configuration, QueryConfiguration config, ObjectMapper mapper) {
+    public MySqlBrushContainer(
+            @Nullable UUID uuid, Configuration configuration, QueryConfiguration config, ObjectMapper mapper) {
         super(uuid, configuration, config, mapper);
     }
 
     @Override
     public CompletableFuture<Optional<Brush>> get(String name) {
-        return CompletableFuture.supplyAsync(() ->
-                query("SELECT brush FROM brushes WHERE uuid = ? AND " + nameMatch().condition())
-                        .single(call().bind(owner(), UUID_BYTES).bind(name))
-                        .map(rs -> parseToObject(rs.getString("brush"), Brush.class))
-                        .first());
+        return CompletableFuture.supplyAsync(() -> query("SELECT brush FROM brushes WHERE uuid = ? AND "
+                        + nameMatch().condition())
+                .single(call().bind(owner(), UUID_BYTES).bind(name))
+                .map(rs -> parseToObject(rs.getString("brush"), Brush.class))
+                .first());
     }
 
     public CompletableFuture<List<Brush>> page(int page, int size) {
-        return CompletableFuture.supplyAsync(() ->
-                query("SELECT brush FROM brushes WHERE uuid = ? ORDER BY name LIMIT ? OFFSET ?")
+        return CompletableFuture.supplyAsync(
+                () -> query("SELECT brush FROM brushes WHERE uuid = ? ORDER BY name LIMIT ? OFFSET ?")
                         .single(call().bind(owner(), UUID_BYTES).bind(size).bind(size * page))
                         .map(rs -> parseToObject(rs.getString("brush"), Brush.class))
                         .all());
@@ -56,11 +57,16 @@ public class MySqlBrushContainer extends BaseContainer<Brush> implements BrushCo
     public CompletableFuture<Void> add(Brush brush) {
         return CompletableFuture.runAsync(() -> {
             try (var transaction = withSingleTransaction()) {
-                transaction.query("DELETE FROM brushes WHERE uuid = ? AND " + nameMatch().condition())
+                transaction
+                        .query("DELETE FROM brushes WHERE uuid = ? AND "
+                                + nameMatch().condition())
                         .single(call().bind(owner(), UUID_BYTES).bind(brush.name()))
                         .delete();
-                transaction.query(upsert())
-                        .single(call().bind(owner(), UUID_BYTES).bind(brush.name()).bind(parseToString(brush)))
+                transaction
+                        .query(upsert())
+                        .single(call().bind(owner(), UUID_BYTES)
+                                .bind(brush.name())
+                                .bind(parseToString(brush)))
                         .insert();
             }
         });
@@ -77,29 +83,27 @@ public class MySqlBrushContainer extends BaseContainer<Brush> implements BrushCo
 
     @Override
     public CompletableFuture<Collection<Brush>> all() {
-        return CompletableFuture.supplyAsync(() ->
-                query("SELECT uuid, name, brush FROM brushes WHERE uuid = ?")
-                        .single(call().bind(owner(), UUID_BYTES))
-                        .map(resultSet -> parseToObject(resultSet.getString("brush"), Brush.class))
-                        .all());
+        return CompletableFuture.supplyAsync(() -> query("SELECT uuid, name, brush FROM brushes WHERE uuid = ?")
+                .single(call().bind(owner(), UUID_BYTES))
+                .map(resultSet -> parseToObject(resultSet.getString("brush"), Brush.class))
+                .all());
     }
 
     @Override
     public CompletableFuture<Boolean> remove(String name) {
-        return CompletableFuture.supplyAsync(() ->
-                query("DELETE FROM brushes WHERE uuid = ? AND " + nameMatch().condition())
-                        .single(call().bind(owner(), UUID_BYTES).bind(name))
-                        .delete()
-                        .changed());
+        return CompletableFuture.supplyAsync(() -> query(
+                        "DELETE FROM brushes WHERE uuid = ? AND " + nameMatch().condition())
+                .single(call().bind(owner(), UUID_BYTES).bind(name))
+                .delete()
+                .changed());
     }
 
     @Override
     protected CompletableFuture<List<String>> retrieveNames() {
-        return CompletableFuture.supplyAsync(() ->
-                query("SELECT name FROM brushes WHERE uuid = ?")
-                        .single(call().bind(owner(), UUID_BYTES))
-                        .map(resultSet -> resultSet.getString("name"))
-                        .all());
+        return CompletableFuture.supplyAsync(() -> query("SELECT name FROM brushes WHERE uuid = ?")
+                .single(call().bind(owner(), UUID_BYTES))
+                .map(resultSet -> resultSet.getString("name"))
+                .all());
     }
 
     @Override

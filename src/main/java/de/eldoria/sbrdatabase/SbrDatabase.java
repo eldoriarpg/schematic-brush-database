@@ -107,23 +107,36 @@ public class SbrDatabase extends EldoPlugin {
     }
 
     private void setupMariaDb() throws IOException, SQLException {
-        var source = applyBaseDb(MariaDb.get(), configuration.storages().mariadb()).build();
-        closeOnFailure(source, () -> SqlUpdater.builder(source, MariaDb.get())
-                .withClassLoader(getClassLoader())
-                .setVersionTable("sbr_version")
-                .preUpdateHook(new SqlVersion(1, 1), rejectYamlEntries(""))
-                .execute());
-        sbr.storageRegistry().register(SbrDatabase.mariadb, new MariaDbStorage(QueryConfiguration.getDefault().edit(source).build(), configuration, mapper));
+        var source =
+                applyBaseDb(MariaDb.get(), configuration.storages().mariadb()).build();
+        closeOnFailure(
+                source,
+                () -> SqlUpdater.builder(source, MariaDb.get())
+                        .withClassLoader(getClassLoader())
+                        .setVersionTable("sbr_version")
+                        .preUpdateHook(new SqlVersion(1, 1), rejectYamlEntries(""))
+                        .execute());
+        sbr.storageRegistry()
+                .register(
+                        SbrDatabase.mariadb,
+                        new MariaDbStorage(
+                                QueryConfiguration.getDefault().edit(source).build(), configuration, mapper));
     }
 
     private void setupMySql() throws IOException, SQLException {
         var source = applyBaseDb(MySql.get(), configuration.storages().mysql()).build();
-        closeOnFailure(source, () -> SqlUpdater.builder(source, MySql.get())
-                .withClassLoader(getClassLoader())
-                .setVersionTable("sbr_version")
-                .preUpdateHook(new SqlVersion(1, 1), rejectYamlEntries(""))
-                .execute());
-        sbr.storageRegistry().register(SbrDatabase.mysql, new MySqlStorage(QueryConfiguration.getDefault().edit(source).build(), configuration, mapper));
+        closeOnFailure(
+                source,
+                () -> SqlUpdater.builder(source, MySql.get())
+                        .withClassLoader(getClassLoader())
+                        .setVersionTable("sbr_version")
+                        .preUpdateHook(new SqlVersion(1, 1), rejectYamlEntries(""))
+                        .execute());
+        sbr.storageRegistry()
+                .register(
+                        SbrDatabase.mysql,
+                        new MySqlStorage(
+                                QueryConfiguration.getDefault().edit(source).build(), configuration, mapper));
     }
 
     private void setupPostgres() throws IOException, SQLException {
@@ -133,15 +146,21 @@ public class SbrDatabase extends EldoPlugin {
                 .build();
 
         try (var update = applyBaseDb(PostgreSql.get(), postgres).build()) {
-            closeOnFailure(source, () -> SqlUpdater.builder(update, PostgreSql.get())
-                    .withClassLoader(getClassLoader())
-                    .setReplacements(new QueryReplacement("sbr_database", postgres.schema()))
-                    .setSchemas(postgres.schema())
-                    .setVersionTable("sbr_version")
-                    .preUpdateHook(new SqlVersion(1, 1), rejectYamlEntries(postgres.schema() + "."))
-                    .execute());
+            closeOnFailure(
+                    source,
+                    () -> SqlUpdater.builder(update, PostgreSql.get())
+                            .withClassLoader(getClassLoader())
+                            .setReplacements(new QueryReplacement("sbr_database", postgres.schema()))
+                            .setSchemas(postgres.schema())
+                            .setVersionTable("sbr_version")
+                            .preUpdateHook(new SqlVersion(1, 1), rejectYamlEntries(postgres.schema() + "."))
+                            .execute());
         }
-        sbr.storageRegistry().register(SbrDatabase.postgres, new PostgresStorage(QueryConfiguration.getDefault().edit(source).build(), configuration, mapper));
+        sbr.storageRegistry()
+                .register(
+                        SbrDatabase.postgres,
+                        new PostgresStorage(
+                                QueryConfiguration.getDefault().edit(source).build(), configuration, mapper));
     }
 
     /**
@@ -186,16 +205,20 @@ public class SbrDatabase extends EldoPlugin {
      */
     private ThrowingConsumer<Connection, SQLException> rejectYamlEntries(String tablePrefix) {
         return conn -> {
-            var query = "SELECT (SELECT count(1) FROM %1$sbrushes) + (SELECT count(1) FROM %1$spresets) AS count".formatted(tablePrefix);
-            try (var stmt = conn.prepareStatement(query); var rs = stmt.executeQuery()) {
+            var query = "SELECT (SELECT count(1) FROM %1$sbrushes) + (SELECT count(1) FROM %1$spresets) AS count"
+                    .formatted(tablePrefix);
+            try (var stmt = conn.prepareStatement(query);
+                    var rs = stmt.executeQuery()) {
                 if (rs.next() && rs.getLong("count") > 0) {
-                    throw new SQLException("The database contains brushes or presets stored before version 1.1. Update it with SchematicBrushDatabase 1.1.10 before using version 2.");
+                    throw new SQLException(
+                            "The database contains brushes or presets stored before version 1.1. Update it with SchematicBrushDatabase 1.1.10 before using version 2.");
                 }
             }
         };
     }
 
-    private <T extends RemoteJdbcConfig<?>, U extends UpdaterBuilder<T, ?>> ConfigurationStage applyBaseDb(Database<T, U> type, BaseDbConfig config) {
+    private <T extends RemoteJdbcConfig<?>, U extends UpdaterBuilder<T, ?>> ConfigurationStage applyBaseDb(
+            Database<T, U> type, BaseDbConfig config) {
         return DataSourceCreator.create(type)
                 .configure(remote -> remote.host(config.host())
                         .port(config.port())

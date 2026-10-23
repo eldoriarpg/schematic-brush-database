@@ -5,18 +5,22 @@
  */
 package de.eldoria.sbrdatabase.dao.postgres;
 
-import tools.jackson.databind.ObjectMapper;
 import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.NameMatch;
 import de.eldoria.sbrdatabase.dao.mysql.MySqlBrushContainer;
 import org.jetbrains.annotations.Nullable;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.UUID;
 
 public class PostgresBrushContainer extends MySqlBrushContainer {
 
-    public PostgresBrushContainer(@Nullable UUID uuid, Configuration configuration, QueryConfiguration queryConfiguration, ObjectMapper mapper) {
+    public PostgresBrushContainer(
+            @Nullable UUID uuid,
+            Configuration configuration,
+            QueryConfiguration queryConfiguration,
+            ObjectMapper mapper) {
         super(uuid, configuration, queryConfiguration, mapper);
     }
 

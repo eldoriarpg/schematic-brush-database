@@ -17,7 +17,8 @@ public enum NameMatch {
      * Compares the lower-cased names byte by byte in utf8mb4. A plain {@code =} would use the column collation, which
      * on MySQL and MariaDB usually ignores accents as well.
      */
-    MYSQL("CONVERT(LOWER(name) USING utf8mb4) COLLATE utf8mb4_bin = CONVERT(LOWER(?) USING utf8mb4) COLLATE utf8mb4_bin"),
+    MYSQL(
+            "CONVERT(LOWER(name) USING utf8mb4) COLLATE utf8mb4_bin = CONVERT(LOWER(?) USING utf8mb4) COLLATE utf8mb4_bin"),
     /**
      * Compares the lower-cased names. Text comparison in PostgreSQL is exact apart from case.
      */

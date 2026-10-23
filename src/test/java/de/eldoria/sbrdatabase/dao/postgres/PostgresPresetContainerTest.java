@@ -36,11 +36,14 @@ class PostgresPresetContainerTest {
     void setUp(@TempDir Path dir) {
         var dataSource = new SQLiteDataSource();
         dataSource.setUrl("jdbc:sqlite:" + dir.resolve("presets.db"));
-        queries = QueryConfiguration.builder(dataSource).setThrowExceptions(true).build();
-        queries.query("CREATE TABLE presets(uuid BLOB NOT NULL, name TEXT NOT NULL, preset TEXT NOT NULL, UNIQUE (uuid, name))")
+        queries =
+                QueryConfiguration.builder(dataSource).setThrowExceptions(true).build();
+        queries.query(
+                        "CREATE TABLE presets(uuid BLOB NOT NULL, name TEXT NOT NULL, preset TEXT NOT NULL, UNIQUE (uuid, name))")
                 .single()
                 .insert();
-        container = new PostgresPresetContainer(OWNER, null, queries, JsonMapper.builder().build());
+        container = new PostgresPresetContainer(
+                OWNER, null, queries, JsonMapper.builder().build());
     }
 
     @Test

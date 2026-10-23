@@ -32,13 +32,18 @@ import java.util.logging.Level;
 public abstract class BaseContainer<T> implements Container<T> {
     @NotNull
     private final UUID uuid;
+
     private final Configuration configuration;
     private Set<String> names = Collections.emptySet();
     private Instant lastRefresh = Instant.MIN;
     private final QueryConfiguration queryConfiguration;
     private final ObjectMapper mapper;
 
-    public BaseContainer(@Nullable UUID uuid, Configuration configuration, QueryConfiguration queryConfiguration, ObjectMapper mapper) {
+    public BaseContainer(
+            @Nullable UUID uuid,
+            Configuration configuration,
+            QueryConfiguration queryConfiguration,
+            ObjectMapper mapper) {
         this.uuid = uuid == null ? Container.GLOBAL : uuid;
         this.configuration = configuration;
         this.queryConfiguration = queryConfiguration;
