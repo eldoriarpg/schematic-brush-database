@@ -3,6 +3,7 @@ jackson = "3.2.4"
 utilities = "3.5.0"
 paper = "1.21.11-R0.1-SNAPSHOT"
 sadu = "2.3.9"
+palantir = "2.102.0"
 
 [libraries]
 schematicbrushreborn-api = "de.eldoria:schematicbrushreborn-api:3.0.1"
