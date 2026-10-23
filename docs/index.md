@@ -49,6 +49,10 @@ For Schematic Brush Reborn 2, use version 1.1.10.
 
 The add-on creates its tables on the first connection and keeps them up to date on later starts.
 
+Brush and preset names work as they do in the YAML storage: a name matches only exactly the same name, and upper and
+lower case do not matter. `Tree` and `tree` are the same brush, so saving `tree` replaces a saved `Tree`.
+`%` and `_` in a name are ordinary characters.
+
 ## Next steps
 
 - [Set up the database](./setup.md): install the add-on, connect it and switch Schematic Brush Reborn over.

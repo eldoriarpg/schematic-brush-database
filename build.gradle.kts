@@ -39,6 +39,8 @@ dependencies {
     testImplementation(libs.bundles.utilities)
     testImplementation(platform(libs.jackson.bom))
     testImplementation(libs.bundles.jackson)
+    testImplementation(libs.bundles.sadu)
+    testImplementation(libs.sqlite)
 }
 
 java {
@@ -80,6 +82,7 @@ tasks {
 
     test {
         useJUnitPlatform()
+        jvmArgs("--enable-native-access=ALL-UNNAMED")
     }
 
     build {

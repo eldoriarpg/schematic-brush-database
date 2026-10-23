@@ -9,6 +9,7 @@ import tools.jackson.databind.ObjectMapper;
 import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BaseContainer;
+import de.eldoria.sbrdatabase.dao.base.NameMatch;
 import de.eldoria.schematicbrush.storage.preset.Preset;
 import de.eldoria.schematicbrush.storage.preset.PresetContainer;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +32,7 @@ public class MySqlPresetContainer extends BaseContainer<Preset> implements Prese
     @Override
     public CompletableFuture<Optional<Preset>> get(String name) {
         return CompletableFuture.supplyAsync(() ->
-                query("SELECT preset FROM presets WHERE uuid = ? AND name LIKE ?")
+                query("SELECT preset FROM presets WHERE uuid = ? AND " + nameMatch().condition())
                         .single(call().bind(owner(), UUID_BYTES).bind(name))
                         .map(resultSet -> parseToObject(resultSet.getString("preset"), Preset.class))
                         .first());
@@ -46,12 +47,33 @@ public class MySqlPresetContainer extends BaseContainer<Preset> implements Prese
                         .all());
     }
 
+    /**
+     * Saves the preset and replaces any stored preset whose name differs from it only in case.
+     *
+     * @param preset preset to save
+     * @return future that completes once the preset is saved
+     */
     @Override
     public CompletableFuture<Void> add(Preset preset) {
-        return CompletableFuture.runAsync(() ->
-                query("INSERT INTO presets(uuid, name, preset) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE preset = VALUES(preset)")
+        return CompletableFuture.runAsync(() -> {
+            try (var transaction = withSingleTransaction()) {
+                transaction.query("DELETE FROM presets WHERE uuid = ? AND " + nameMatch().condition())
+                        .single(call().bind(owner(), UUID_BYTES).bind(preset.name()))
+                        .delete();
+                transaction.query(upsert())
                         .single(call().bind(owner(), UUID_BYTES).bind(preset.name()).bind(parseToString(preset)))
-                        .insert());
+                        .insert();
+            }
+        });
+    }
+
+    /**
+     * Statement that inserts a preset, or overwrites the one the unique key of the table considers the same.
+     *
+     * @return SQL statement with placeholders for owner, name and serialized preset
+     */
+    protected String upsert() {
+        return "INSERT INTO presets(uuid, name, preset) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE name = VALUES(name), preset = VALUES(preset)";
     }
 
     @Override
@@ -65,7 +87,7 @@ public class MySqlPresetContainer extends BaseContainer<Preset> implements Prese
 
     @Override
     public CompletableFuture<Boolean> remove(String name) {
-        return CompletableFuture.supplyAsync(() -> query("DELETE FROM presets WHERE uuid = ? AND name LIKE ?")
+        return CompletableFuture.supplyAsync(() -> query("DELETE FROM presets WHERE uuid = ? AND " + nameMatch().condition())
                 .single(call().bind(owner(), UUID_BYTES).bind(name))
                 .delete()
                 .changed());
@@ -85,5 +107,10 @@ public class MySqlPresetContainer extends BaseContainer<Preset> implements Prese
                 .single(call().bind(owner(), UUID_BYTES))
                 .map(rs -> rs.getInt("count"))
                 .first().orElse(0));
+    }
+
+    @Override
+    protected NameMatch nameMatch() {
+        return NameMatch.MYSQL;
     }
 }

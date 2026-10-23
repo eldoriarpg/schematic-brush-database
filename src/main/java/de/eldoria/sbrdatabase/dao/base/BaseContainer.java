@@ -70,6 +70,13 @@ public abstract class BaseContainer<T> implements Container<T> {
 
     protected abstract CompletableFuture<List<String>> retrieveNames();
 
+    /**
+     * How this container's database matches a stored name against a requested one.
+     *
+     * @return name match of the database
+     */
+    protected abstract NameMatch nameMatch();
+
     public abstract CompletableFuture<List<T>> page(int page, int size);
 
     @Override
