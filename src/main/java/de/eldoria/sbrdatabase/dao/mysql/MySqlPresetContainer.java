@@ -9,6 +9,7 @@ import tools.jackson.databind.ObjectMapper;
 import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BaseContainer;
+import de.eldoria.sbrdatabase.dao.base.NameMatch;
 import de.eldoria.schematicbrush.storage.preset.Preset;
 import de.eldoria.schematicbrush.storage.preset.PresetContainer;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +32,7 @@ public class MySqlPresetContainer extends BaseContainer<Preset> implements Prese
     @Override
     public CompletableFuture<Optional<Preset>> get(String name) {
         return CompletableFuture.supplyAsync(() ->
-                query("SELECT preset FROM presets WHERE uuid = ? AND name LIKE ?")
+                query("SELECT preset FROM presets WHERE uuid = ? AND " + nameMatch().condition())
                         .single(call().bind(owner(), UUID_BYTES).bind(name))
                         .map(resultSet -> parseToObject(resultSet.getString("preset"), Preset.class))
                         .first());
@@ -65,7 +66,7 @@ public class MySqlPresetContainer extends BaseContainer<Preset> implements Prese
 
     @Override
     public CompletableFuture<Boolean> remove(String name) {
-        return CompletableFuture.supplyAsync(() -> query("DELETE FROM presets WHERE uuid = ? AND name LIKE ?")
+        return CompletableFuture.supplyAsync(() -> query("DELETE FROM presets WHERE uuid = ? AND " + nameMatch().condition())
                 .single(call().bind(owner(), UUID_BYTES).bind(name))
                 .delete()
                 .changed());
@@ -85,5 +86,10 @@ public class MySqlPresetContainer extends BaseContainer<Preset> implements Prese
                 .single(call().bind(owner(), UUID_BYTES))
                 .map(rs -> rs.getInt("count"))
                 .first().orElse(0));
+    }
+
+    @Override
+    protected NameMatch nameMatch() {
+        return NameMatch.MYSQL;
     }
 }

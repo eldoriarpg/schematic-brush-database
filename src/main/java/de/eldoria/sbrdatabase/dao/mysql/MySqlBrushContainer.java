@@ -9,6 +9,7 @@ import tools.jackson.databind.ObjectMapper;
 import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BaseContainer;
+import de.eldoria.sbrdatabase.dao.base.NameMatch;
 import de.eldoria.schematicbrush.storage.brush.Brush;
 import de.eldoria.schematicbrush.storage.brush.BrushContainer;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +32,7 @@ public class MySqlBrushContainer extends BaseContainer<Brush> implements BrushCo
     @Override
     public CompletableFuture<Optional<Brush>> get(String name) {
         return CompletableFuture.supplyAsync(() ->
-                query("SELECT brush FROM brushes WHERE uuid = ? AND name LIKE ?")
+                query("SELECT brush FROM brushes WHERE uuid = ? AND " + nameMatch().condition())
                         .single(call().bind(owner(), UUID_BYTES).bind(name))
                         .map(rs -> parseToObject(rs.getString("brush"), Brush.class))
                         .first());
@@ -66,7 +67,7 @@ public class MySqlBrushContainer extends BaseContainer<Brush> implements BrushCo
     @Override
     public CompletableFuture<Boolean> remove(String name) {
         return CompletableFuture.supplyAsync(() ->
-                query("DELETE FROM brushes WHERE uuid = ? AND name LIKE ?")
+                query("DELETE FROM brushes WHERE uuid = ? AND " + nameMatch().condition())
                         .single(call().bind(owner(), UUID_BYTES).bind(name))
                         .delete()
                         .changed());
@@ -88,5 +89,10 @@ public class MySqlBrushContainer extends BaseContainer<Brush> implements BrushCo
                 .map(rs -> rs.getInt("count"))
                 .first()
                 .orElse(0));
+    }
+
+    @Override
+    protected NameMatch nameMatch() {
+        return NameMatch.MYSQL;
     }
 }
