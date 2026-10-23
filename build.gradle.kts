@@ -82,6 +82,7 @@ tasks {
 
     test {
         useJUnitPlatform()
+        jvmArgs("--enable-native-access=ALL-UNNAMED")
     }
 
     build {

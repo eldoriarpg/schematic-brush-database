@@ -10,14 +10,9 @@ import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.NameMatch;
 import de.eldoria.sbrdatabase.dao.mysql.MySqlPresetContainer;
-import de.eldoria.schematicbrush.storage.preset.Preset;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-
-import static de.chojo.sadu.queries.api.call.Call.call;
-import static de.chojo.sadu.queries.converter.StandardValueConverter.UUID_BYTES;
 
 public class PostgresPresetContainer extends MySqlPresetContainer {
 
@@ -26,10 +21,8 @@ public class PostgresPresetContainer extends MySqlPresetContainer {
     }
 
     @Override
-    public CompletableFuture<Void> add(Preset preset) {
-        return CompletableFuture.runAsync(() -> query("INSERT INTO presets(uuid, name, preset) VALUES(?, ?, ?) ON CONFLICT(uuid, name) DO UPDATE SET preset = excluded.preset")
-                .single(call().bind(owner(), UUID_BYTES).bind(preset.name()).bind(parseToString(preset)))
-                .insert());
+    protected String upsert() {
+        return "INSERT INTO presets(uuid, name, preset) VALUES(?, ?, ?) ON CONFLICT(uuid, name) DO UPDATE SET preset = excluded.preset";
     }
 
     @Override

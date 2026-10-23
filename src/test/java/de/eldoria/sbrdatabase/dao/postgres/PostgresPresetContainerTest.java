@@ -6,6 +6,7 @@
 package de.eldoria.sbrdatabase.dao.postgres;
 
 import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
+import de.eldoria.schematicbrush.storage.preset.Preset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -13,6 +14,7 @@ import org.sqlite.SQLiteDataSource;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.UUID;
 
 import static de.chojo.sadu.queries.api.call.Call.call;
@@ -66,6 +68,23 @@ class PostgresPresetContainerTest {
 
         assertTrue(container.remove("tREE").join());
         assertEquals(0, container.size().join());
+    }
+
+    @Test
+    void savingReplacesNameThatDiffersOnlyInCase() {
+        store("Tree");
+        store("bush");
+
+        container.add(new Preset("tree", List.of())).join();
+
+        assertEquals(List.of("bush", "tree"), storedNames());
+    }
+
+    private List<String> storedNames() {
+        return queries.query("SELECT name FROM presets ORDER BY name")
+                .single()
+                .map(row -> row.getString("name"))
+                .all();
     }
 
     private void store(String name) {

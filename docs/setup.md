@@ -101,7 +101,7 @@ To copy everything from the YAML files into a MariaDB database:
 
 - You need the permission `schematicbrush.admin.migrate`.
 - Both storage types must be available. A database type is available once it is in `activeTypes` and connected.
-- Entries in the target with the same name are overwritten.
+- Entries in the target with the same name are overwritten, even if upper and lower case differ.
 - Nothing is removed from the source.
 
 See the [command reference](/schematic-brush-reborn/reference/commands) for the full list of core commands.
