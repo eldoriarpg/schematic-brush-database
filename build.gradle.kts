@@ -84,6 +84,8 @@ tasks {
         relocate("de.eldoria.jacksonbukkit", shadebase + "jacksonbukkit")
         relocate("de.eldoria.eldoutilities", shadebase + "utilities")
         mergeServiceFiles()
+        addMultiReleaseAttribute = false
+        exclude("META-INF/versions/**")
     }
 
     test {
