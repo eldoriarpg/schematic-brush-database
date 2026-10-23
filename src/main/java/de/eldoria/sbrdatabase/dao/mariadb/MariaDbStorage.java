@@ -5,13 +5,16 @@
  */
 package de.eldoria.sbrdatabase.dao.mariadb;
 
-import tools.jackson.databind.ObjectMapper;
 import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BaseStorage;
+import tools.jackson.databind.ObjectMapper;
 
 public class MariaDbStorage extends BaseStorage {
     public MariaDbStorage(QueryConfiguration queryConfiguration, Configuration configuration, ObjectMapper mapper) {
-        super(new MariaDbPresets(queryConfiguration, configuration, mapper), new MariaDbBrushes(queryConfiguration, configuration, mapper), queryConfiguration);
+        super(
+                new MariaDbPresets(queryConfiguration, configuration, mapper),
+                new MariaDbBrushes(queryConfiguration, configuration, mapper),
+                queryConfiguration);
     }
 }

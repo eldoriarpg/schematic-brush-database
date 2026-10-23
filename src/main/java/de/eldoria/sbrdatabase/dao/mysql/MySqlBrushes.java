@@ -5,11 +5,11 @@
  */
 package de.eldoria.sbrdatabase.dao.mysql;
 
-import tools.jackson.databind.ObjectMapper;
 import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import de.eldoria.sbrdatabase.configuration.Configuration;
 import de.eldoria.sbrdatabase.dao.base.BaseBrushes;
 import de.eldoria.schematicbrush.storage.brush.BrushContainer;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Map;
 import java.util.UUID;
@@ -28,16 +28,13 @@ public class MySqlBrushes extends BaseBrushes {
 
     @Override
     public CompletableFuture<Map<UUID, ? extends BrushContainer>> playerContainers() {
-        return CompletableFuture.supplyAsync(() -> query("""
+        return CompletableFuture.supplyAsync(
+                () -> query("""
                 SELECT DISTINCT uuid
                 FROM brushes
                 WHERE uuid IS NOT NULL
-                """)
-                .single()
-                .map(resultSet -> resultSet.get("uuid", UUID_BYTES))
-                .all()
-                .stream()
-                .collect(Collectors.toMap(uuid -> uuid, this::playerContainer)));
+                """).single().map(resultSet -> resultSet.get("uuid", UUID_BYTES)).all().stream()
+                        .collect(Collectors.toMap(uuid -> uuid, this::playerContainer)));
     }
 
     @Override

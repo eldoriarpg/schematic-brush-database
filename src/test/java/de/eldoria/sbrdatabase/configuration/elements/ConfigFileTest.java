@@ -64,7 +64,9 @@ class ConfigFileTest {
 
     private Configurations<ConfigFile> load(String yaml) throws IOException {
         Files.writeString(dir.resolve("config.yml"), yaml);
-        Key<ConfigFile> key = Key.builder(Path.of("config.yml"), ConfigFile::new).build();
-        return new Configurations<>(dir, key, List.of(new YamlDataFormat()), getClass().getClassLoader(), null);
+        Key<ConfigFile> key =
+                Key.builder(Path.of("config.yml"), ConfigFile::new).build();
+        return new Configurations<>(
+                dir, key, List.of(new YamlDataFormat()), getClass().getClassLoader(), null);
     }
 }
