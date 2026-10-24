@@ -53,6 +53,12 @@ Brush and preset names work as they do in the YAML storage: a name matches only 
 lower case do not matter. `Tree` and `tree` are the same brush, so saving `tree` replaces a saved `Tree`.
 `%` and `_` in a name are ordinary characters.
 
+:::note
+On MySQL and MariaDB, saving treats names that differ only in accents (`Baum` and `Bäum`), or only after their 64th
+character, as the same name, so the new brush or preset replaces the saved one. Looking names up and removing them
+still matches exactly.
+:::
+
 ## Next steps
 
 - [Set up the database](./setup.md): install the add-on, connect it and switch Schematic Brush Reborn over.
