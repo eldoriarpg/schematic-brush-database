@@ -1,8 +1,8 @@
 [versions]
-jackson = "3.2.4"
+jackson = "3.3.0"
 utilities = "3.7.0"
 paper = "1.21.11-R0.1-SNAPSHOT"
-sadu = "2.4.0"
+sadu = "2.4.2"
 palantir = "2.102.0"
 
 [libraries]
@@ -43,7 +43,7 @@ sadu = ["sadu-core", "sadu-queries", "sadu-datasource", "sadu-updater", "sadu-po
 drivers = ["postgresql", "mariadb", "mysql"]
 
 [plugins]
-spotless = { id = "com.diffplug.spotless", version = "8.10.4" }
+spotless = { id = "com.diffplug.spotless", version = "8.11.0" }
 publishdata = { id = "de.chojo.publishdata", version = "2.3.0" }
 publishdata-manifest = { id = "de.chojo.publishdata.manifest", version = "2.3.0" }
 shadow = { id = "com.gradleup.shadow", version = "9.6.1" }
